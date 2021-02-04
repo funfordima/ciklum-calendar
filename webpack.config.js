@@ -45,6 +45,7 @@ const cssLoaders = (extra) => {
     loaders.push(extra);
   }
 
+  // return extra ? [extra] : loaders;
   return loaders;
 };
 
@@ -104,7 +105,7 @@ module.exports = {
       },
       {
         test: /\.(ttf|woff|woff2|eot)$/,
-        use: ['file-loader']
+        type: 'asset/inline',
       },
       {
         test: /\.(sass|scss)$/,
