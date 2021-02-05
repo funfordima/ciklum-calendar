@@ -234,6 +234,7 @@ html {
     position: relative;
 
     &_title {
+      display: none;
       font-size: 2rem;
     }
 
@@ -252,6 +253,10 @@ html {
       background-color: #d3f5b4;
 
       & .main__item_btn-close {
+        display: block;
+      }
+
+      & .main__item_title {
         display: block;
       }
     }
