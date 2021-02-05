@@ -36,11 +36,37 @@ export default class Calendar {
     });
   }
 
+  async getDataToDo() {
+    const response = await fetch('../src/db.json');
+
+    if (!response.ok) {
+      throw new Error(`Could not fetch url, status: ${response.status}`);
+    }
+
+    const json = await response.json();
+
+    return json;
+  }
+
+  async generateToDoItems(parentElement) {
+    const todos = await this.getDataToDo();
+    todos.forEach(({
+      title,
+      dataCol,
+      dataRow,
+      complete,
+    }) => {
+      const todoContainer = create('div', 'main__item', null, parentElement, ['data-col', dataCol], ['data-row', dataRow], ['data-complete', complete]);
+      create('h3', 'main__item_title', title, todoContainer);
+      create('div', 'main__item_btn-close', '&times;', todoContainer);
+    });
+  }
+
   createMain() {
     const main = create('main', 'main', null, this.root);
     const rowContainer = create('div', 'row-container', null, main);
     const columnContainer = create('div', 'col-container', null, main);
-    create('div', 'content-container', null, main);
+    const contentContainer = create('div', 'content-container', null, main);
 
     this.days.forEach((dayItem) => {
       create('div', 'main__item', dayItem, rowContainer);
@@ -49,6 +75,8 @@ export default class Calendar {
     this.timeLabels.forEach((timeItem) => {
       create('div', 'main__item', timeItem, columnContainer);
     });
+
+    this.generateToDoItems(contentContainer);
   }
 
   init() {

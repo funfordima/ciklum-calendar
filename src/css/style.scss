@@ -1,4 +1,4 @@
-@import "./fonts/fonts.css";
+@import './fonts/fonts.css';
 
 * {
   margin: 0;
@@ -12,7 +12,7 @@
 
 html {
   height: 100%;
-  font-family: "Roboto", Arial, sans-serif;
+  font-family: 'Roboto', Arial, sans-serif;
   font-size: 1.5rem;
 }
 
@@ -35,7 +35,7 @@ html {
     width: 10rem;
 
     &_link {
-      color: #D8093A;
+      color: #d8093a;
       text-decoration: none;
       cursor: pointer;
 
@@ -75,7 +75,7 @@ html {
     font-weight: bold;
     background-color: #ffffff;
     color: #333333;
-  
+
     &:hover {
       background-color: #d32f2f;
       color: #ffffff;
@@ -84,7 +84,7 @@ html {
 
   &-add:hover {
     background-color: #81c784;
-  } 
+  }
 
   &__container {
     width: 50%;
@@ -103,7 +103,7 @@ html {
   height: 40px;
   margin: 0 auto;
 
-  &[data-state="active"] {
+  &[data-state='active'] {
     .menu__title {
       &::before {
         transform: translate(-3px, -50%) rotate(-45deg);
@@ -113,11 +113,11 @@ html {
         transform: translate(3px, -50%) rotate(45deg);
       }
     }
-    
+
     .menu__content {
       opacity: 1;
     }
-    
+
     .menu__label + .menu__input + .menu__label {
       max-height: 40px;
       border-top-width: 1px;
@@ -136,7 +136,7 @@ html {
 
     &::before,
     &::after {
-      content: "";
+      content: '';
       position: absolute;
       top: 50%;
       right: 16px;
@@ -153,11 +153,11 @@ html {
     }
 
     &:hover {
-      border-color: #D8093A;
+      border-color: #d8093a;
 
       &::before,
       &::after {
-        background-color: #D8093A;
+        background-color: #d8093a;
       }
     }
   }
@@ -178,7 +178,7 @@ html {
     opacity: 0;
     z-index: 8;
   }
- 
+
   &__input {
     display: none;
 
@@ -204,11 +204,11 @@ html {
     text-overflow: ellipsis;
 
     & + input + & {
-      border-top: 0 solid #C7CCD160;
+      border-top: 0 solid #c7ccd160;
     }
 
     &:hover {
-      background-color: #D8093A !important;
+      background-color: #d8093a !important;
       color: #ffffff;
     }
   }
@@ -219,7 +219,7 @@ html {
   height: 500px; ////
   display: flex;
   flex-wrap: wrap;
-  background-color: #C8C8C8;
+  background-color: #c8c8c8;
   border: 1px solid #eee;
 
   &__item {
@@ -231,19 +231,44 @@ html {
     background-color: #fff;
     overflow: hidden;
     text-overflow: ellipsis;
+    position: relative;
+    cursor: pointer;
+
+    &_title {
+      font-size: 2rem;
+    }
+
+    &_btn-close {
+      display: none;
+      position: absolute;
+      right: 5px;
+      top: -2px;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    &[data-complete='true'] {
+      background-color: #d3f5b4;
+
+      & .main__item_btn-close {
+        display: block;
+      }
+    }
   }
 }
 
 .row-container {
   display: grid;
   grid-template-rows: 1fr;
-  grid-template-columns: 10% repeat(5, 1fr);
+  grid-template-columns: calc(10% - 1px) repeat(5, 1fr);
   row-gap: 2px;
   column-gap: 2px;
   width: 100%;
   height: 6rem;
-  background-color: #E5E5E5;
-  border: 2px solid #C7C7C7;
+  background-color: #e5e5e5;
+  border: 2px solid #c7c7c7;
 }
 
 .col-container {
@@ -254,8 +279,9 @@ html {
   column-gap: 2px;
   width: 10%;
   height: calc(100% - 6rem);
-  background-color: #E5E5E5;
-  border: 2px solid #C7C7C7;
+  background-color: #e5e5e5;
+  border: 2px solid #c7c7c7;
+  border-right: 0;
 }
 
 .content-container {
@@ -266,6 +292,6 @@ html {
   grid-template-rows: repeat(9, 1fr);
   row-gap: 2px;
   column-gap: 2px;
-  background-color: #E5E5E5;
-  border: 2px solid #C7C7C7;
+  background-color: #e5e5e5;
+  border: 2px solid #c7c7c7;
 }
