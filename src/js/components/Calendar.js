@@ -1,8 +1,9 @@
 import create from '../utils/create';
 
 export default class Calendar {
-  constructor(members) {
+  constructor(members, url) {
     this.members = members;
+    this.url = url;
     this.root = document.getElementById('root');
     this.days = ['Name', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     this.timeLabels = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
@@ -36,11 +37,37 @@ export default class Calendar {
     });
   }
 
+  async getDataToDo(url) {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Could not fetch ${url}, status: ${response.status}`);
+    }
+
+    const json = await response.json();
+
+    return json;
+  }
+
+  async generateToDoItems(parentElement) {
+    const todos = await this.getDataToDo(this.url);
+    todos.forEach(({
+      title,
+      dataCol,
+      dataRow,
+      complete,
+    }) => {
+      const todoContainer = create('div', 'main__item', null, parentElement, ['data-col', dataCol], ['data-row', dataRow], ['data-complete', complete]);
+      create('h3', 'main__item_title', title, todoContainer);
+      create('div', 'main__item_btn-close', '&times;', todoContainer);
+    });
+  }
+
   createMain() {
     const main = create('main', 'main', null, this.root);
     const rowContainer = create('div', 'row-container', null, main);
     const columnContainer = create('div', 'col-container', null, main);
-    create('div', 'content-container', null, main);
+    const contentContainer = create('div', 'content-container', null, main);
 
     this.days.forEach((dayItem) => {
       create('div', 'main__item', dayItem, rowContainer);
@@ -49,6 +76,8 @@ export default class Calendar {
     this.timeLabels.forEach((timeItem) => {
       create('div', 'main__item', timeItem, columnContainer);
     });
+
+    this.generateToDoItems(contentContainer);
   }
 
   init() {
