@@ -7,6 +7,9 @@ export default class Calendar {
     this.root = document.getElementById('root');
     this.days = ['Name', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     this.timeLabels = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+    this.todos = [];
+    this.members = [];
+    this.contentContainer = '';
   }
 
   createHeader() {
@@ -40,8 +43,8 @@ export default class Calendar {
   }
 
   async generateMembers(parentElement) {
-    const members = await this.getData(this.urlMembersData);
-    members.forEach((member, indx) => {
+    this.members = await this.getData(this.urlMembersData);
+    this.members.forEach((member, indx) => {
       const option = `
         <input id='select_${indx}' class="menu__input" type="radio" name="select" />
         <label for='select_${indx}' class="menu__label">${member}</label>
@@ -50,9 +53,10 @@ export default class Calendar {
     });
   }
 
+  /* eslint no-param-reassign: ["error", { "props": false }] */
   async generateToDoItems(parentElement) {
-    const todos = await this.getData(this.urlToDoData);
-    todos.forEach(({
+    parentElement.innerHTML = '';
+    this.todos.forEach(({
       title,
       dataCol,
       dataRow,
@@ -68,7 +72,7 @@ export default class Calendar {
     const main = create('main', 'main', null, this.root);
     const rowContainer = create('div', 'row-container', null, main);
     const columnContainer = create('div', 'col-container', null, main);
-    const contentContainer = create('div', 'content-container', null, main);
+    this.contentContainer = create('div', 'content-container', null, main);
 
     this.days.forEach((dayItem) => {
       create('div', 'main__item', dayItem, rowContainer);
@@ -78,36 +82,75 @@ export default class Calendar {
       create('div', 'main__item', timeItem, columnContainer);
     });
 
-    this.generateToDoItems(contentContainer);
+    this.generateToDoItems(this.contentContainer);
   }
 
   handlerInputMembers() {
-    const menuLabels = document.querySelectorAll('.menu__label');
+    this.menu.addEventListener('click', ({ target }) => {
+      switch (true) {
+        case (target.classList.contains('menu__title')): {
+          // Toggle menu
+          if (this.menu.getAttribute('data-state') === 'active') {
+            this.menu.setAttribute('data-state', '');
+          } else {
+            this.menu.setAttribute('data-state', 'active');
+          }
 
-    // Toggle menu
-    this.menuTitle.addEventListener('click', () => {
-      if (this.menu.getAttribute('data-state') === 'active') {
-        this.menu.setAttribute('data-state', '');
-      } else {
-        this.menu.setAttribute('data-state', 'active');
+          break;
+        }
+
+        case (target.classList.contains('menu__label')): {
+          // Close when click to input option
+          this.menuTitle.textContent = target.textContent;
+          this.menu.setAttribute('data-state', '');
+
+          // Filter ItemToDo
+          const filterCondition = this.menuTitle.textContent;
+          this.todos.map((todo) => {
+            if (!todo.participants.includes(filterCondition)) {
+              todo.complete = false;
+            } else {
+              todo.complete = true;
+            }
+
+            return todo;
+          });
+
+          // Rerender ItemToDo
+          this.generateToDoItems(this.contentContainer);
+
+          break;
+        }
+
+        default: {
+          console.warn('something went wrong');
+        }
       }
     });
-
-    // Close when click to option
-    for (let i = 0; i < menuLabels.length; i += 1) {
-      menuLabels[i].addEventListener('click', (evt) => {
-        this.menuTitle.textContent = evt.target.textContent;
-        this.menu.setAttribute('data-state', '');
-      });
-    }
 
     // Reset title
     this.resetMenuBtn.addEventListener('click', () => {
       this.menuTitle.textContent = this.menuTitle.getAttribute('data-default');
+
+      this.todos.map((todo) => {
+        todo.participants.forEach((member) => {
+          if (this.members.includes(member)) {
+            todo.complete = true;
+          } else {
+            todo.complete = false;
+          }
+        });
+
+        return todo;
+      });
+
+      // Rerender ItemToDo
+      this.generateToDoItems(this.contentContainer);
     });
   }
 
-  init() {
+  async init() {
+    this.todos = await this.getData(this.urlToDoData);
     const memebersListContainer = this.createHeader();
     this.generateMembers(memebersListContainer);
     this.createMain();
@@ -116,5 +159,9 @@ export default class Calendar {
 
   render() {
     this.init();
+
+    // Handle Event
+    // this.contentContainer.addEventListener('click', (event) => {
+    // });
   }
 }

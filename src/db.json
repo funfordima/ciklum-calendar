@@ -22,7 +22,7 @@
   { "title": "", "participants": [], "day": "", "time": "", "complete": false, "dataCol": 0, "dataRow": 4 },
   { "title": "", "participants": [], "day": "", "time": "", "complete": false, "dataCol": 1, "dataRow": 4 },
   { "title": "", "participants": [], "day": "", "time": "", "complete": false, "dataCol": 2, "dataRow": 4 },
-  { "title": "Daily StandUp", "participants": ["Tanya"], "day": "Fri", "time": "11:00", "complete": true, "dataCol": 3, "dataRow": 4 },
+  { "title": "Daily StandUp", "participants": ["Tamara"], "day": "Fri", "time": "11:00", "complete": true, "dataCol": 3, "dataRow": 4 },
   { "title": "", "participants": [], "day": "", "time": "", "complete": false, "dataCol": 4, "dataRow": 4 },
   { "title": "", "participants": [], "day": "", "time": "", "complete": false, "dataCol": 0, "dataRow": 5 },
   { "title": "", "participants": [], "day": "", "time": "", "complete": false, "dataCol": 1, "dataRow": 5 },
@@ -43,5 +43,5 @@
   { "title": "", "participants": [], "day": "", "time": "", "complete": false, "dataCol": 1, "dataRow": 8 },
   { "title": "", "participants": [], "day": "", "time": "", "complete": false, "dataCol": 2, "dataRow": 8 },
   { "title": "", "participants": [], "day": "", "time": "", "complete": false, "dataCol": 3, "dataRow": 8 },
-  { "title": "FE Team Sync", "participants": ["Maria"], "day": "Tue", "time": "14:00", "complete": true, "dataCol": 4, "dataRow": 8 }
+  { "title": "FE Team Sync", "participants": ["Nick"], "day": "Tue", "time": "14:00", "complete": true, "dataCol": 4, "dataRow": 8 }
 ]
