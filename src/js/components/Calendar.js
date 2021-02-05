@@ -1,9 +1,9 @@
 import create from '../utils/create';
 
 export default class Calendar {
-  constructor(members, url) {
-    this.members = members;
-    this.url = url;
+  constructor(urlToDoData, urlMembersData) {
+    this.urlToDoData = urlToDoData;
+    this.urlMembersData = urlMembersData;
     this.root = document.getElementById('root');
     this.days = ['Name', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     this.timeLabels = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
@@ -15,29 +15,19 @@ export default class Calendar {
     const navContainer = create('div', 'header__form_container', null, header);
     const form = create('form', 'header__form', null, navContainer, ['name', 'members-form']);
     const btnContainer = create('div', 'event-btn__container', null, form);
-    const menu = create('div', 'menu', null, form, ['data-state', '']);
-    const menuContent = create('div', 'menu__content', null, menu);
+    this.menu = create('div', 'menu', null, form, ['data-state', '']);
+    const menuContent = create('div', 'menu__content', null, this.menu);
 
-    create('div', 'menu__title', null, menu, ['data-default', '']);
-    create('p', 'menu__container', menu, form);
+    this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', '']);
+    create('p', 'menu__container', this.menu, form);
     create('input', 'event-btn-add', null, btnContainer, ['type', 'submit'], ['value', 'New Event +']);
-    create('input', 'event-btn-reset', null, btnContainer, ['type', 'reset'], ['value', 'Clear it!']);
+    this.resetMenuBtn = create('input', 'event-btn-reset', null, btnContainer, ['type', 'reset'], ['value', 'Clear it!']);
     create('a', 'header__title_link', 'Calendar', headerTitle, ['href', '#'], ['alt', 'logo link']);
 
     return menuContent;
   }
 
-  generateMembers(parentElement) {
-    this.members.forEach((member, indx) => {
-      const option = `
-        <input id='select_${indx}' class="menu__input" type="radio" name="select" />
-        <label for='select_${indx}' class="menu__label">${member}</label>
-      `;
-      parentElement.insertAdjacentHTML('beforeend', option);
-    });
-  }
-
-  async getDataToDo(url) {
+  async getData(url) {
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -49,8 +39,19 @@ export default class Calendar {
     return json;
   }
 
+  async generateMembers(parentElement) {
+    const members = await this.getData(this.urlMembersData);
+    members.forEach((member, indx) => {
+      const option = `
+        <input id='select_${indx}' class="menu__input" type="radio" name="select" />
+        <label for='select_${indx}' class="menu__label">${member}</label>
+      `;
+      parentElement.insertAdjacentHTML('beforeend', option);
+    });
+  }
+
   async generateToDoItems(parentElement) {
-    const todos = await this.getDataToDo(this.url);
+    const todos = await this.getData(this.urlToDoData);
     todos.forEach(({
       title,
       dataCol,
@@ -80,10 +81,37 @@ export default class Calendar {
     this.generateToDoItems(contentContainer);
   }
 
+  handlerInputMembers() {
+    const menuLabels = document.querySelectorAll('.menu__label');
+
+    // Toggle menu
+    this.menuTitle.addEventListener('click', () => {
+      if (this.menu.getAttribute('data-state') === 'active') {
+        this.menu.setAttribute('data-state', '');
+      } else {
+        this.menu.setAttribute('data-state', 'active');
+      }
+    });
+
+    // Close when click to option
+    for (let i = 0; i < menuLabels.length; i += 1) {
+      menuLabels[i].addEventListener('click', (evt) => {
+        this.menuTitle.textContent = evt.target.textContent;
+        this.menu.setAttribute('data-state', '');
+      });
+    }
+
+    // Reset title
+    this.resetMenuBtn.addEventListener('click', () => {
+      this.menuTitle.textContent = this.menuTitle.getAttribute('data-default');
+    });
+  }
+
   init() {
     const memebersListContainer = this.createHeader();
     this.generateMembers(memebersListContainer);
     this.createMain();
+    this.handlerInputMembers();
   }
 
   render() {

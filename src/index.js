@@ -1,6 +1,4 @@
 import Calendar from './js/components/Calendar';
 import './css/style.scss';
 
-const members = ['tamara', 'nick', 'ivan'];
-
-new Calendar(members, '../src/db.json').render();
+new Calendar('../src/db.json', '../src/members.json').render();
