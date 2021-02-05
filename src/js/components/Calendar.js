@@ -1,11 +1,11 @@
 import create from '../utils/create';
 import createPopUp from '../utils/createPopUp';
 import createItemMember from '../utils/createItemMember';
+import { URL_EVENTS, URL_MEMBERS } from '../constants/constants';
+import Data from '../utils/data';
 
 export default class Calendar {
-  constructor(urlToDoData, urlMembersData) {
-    this.urlToDoData = urlToDoData;
-    this.urlMembersData = urlMembersData;
+  constructor() {
     this.root = document.getElementById('root');
     this.days = ['Name', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     this.timeLabels = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
@@ -25,7 +25,7 @@ export default class Calendar {
 
     this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', '']);
     create('div', 'menu__container', this.menu, form);
-    create('input', 'event-btn-add', null, btnContainer, ['type', 'submit'], ['value', 'New Event +']);
+    this.btnAddItem = create('input', 'event-btn-add', null, btnContainer, ['type', 'submit'], ['value', 'New Event +']);
     this.resetMenuBtn = create('input', 'event-btn-reset', null, btnContainer, ['type', 'reset'], ['value', 'Clear it!']);
     create('a', 'header__title_link', 'Calendar', headerTitle, ['href', '#'], ['alt', 'logo link']);
 
@@ -45,8 +45,19 @@ export default class Calendar {
   }
 
   async generateMembers(parentElement) {
-    this.members = await this.getData(this.urlMembersData);
+    this.members = await Data.getData(URL_MEMBERS);
+    this.members = this.members[Object.keys(this.members)[Object.keys(this.members).length - 1]];
+    localStorage.setItem('members', JSON.stringify(this.members));
+
+    // this.todos = await this.getData(this.urlToDoData);
+    // console.log(this.todos);
+
+    // Data.sendData(URL_EVENTS, this.todos)
+    //   .then(() => console.log('success'));
+
     createItemMember(this.members, parentElement);
+    document.querySelectorAll('.menu__content input').forEach((el, indx) => el.setAttribute('id', `${this.members[indx]}_header`));
+    document.querySelectorAll('.menu__content label').forEach((el, indx) => el.setAttribute('for', `${this.members[indx]}_header`));
   }
 
   /* eslint no-param-reassign: ["error", { "props": false }] */
@@ -146,7 +157,10 @@ export default class Calendar {
   }
 
   async init() {
-    this.todos = await this.getData(this.urlToDoData);
+    this.todos = await Data.getData(URL_EVENTS);
+    this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
+    localStorage.setItem('events', JSON.stringify(this.todos));
+
     const memebersListContainer = this.createHeader();
     this.generateMembers(memebersListContainer);
     this.createMain();
@@ -158,6 +172,11 @@ export default class Calendar {
 
     // Handle Event
     this.contentContainer.addEventListener('click', () => {
+      console.log('hello');
+    });
+
+    this.btnAddItem.addEventListener('click', (e) => {
+      e.preventDefault();
       createPopUp(document.body, this.members, this.days, this.timeLabels);
     });
   }

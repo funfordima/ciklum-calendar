@@ -186,6 +186,7 @@ html {
     &:checked + label {
       background-color: #dedede;
     }
+
     &:disabled + label {
       opacity: 0.6;
       pointer-events: none;
@@ -349,6 +350,10 @@ html {
       display: flex;
       align-items: center;
       justify-content: space-between;
+
+      &:last-of-type {
+        margin-top: 2rem;
+      }
     }
 
     &_label {

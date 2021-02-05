@@ -1,10 +1,11 @@
 import create from './create';
 import createItemMember from './createItemMember';
+import Data from './data';
 
 const createPopUp = (main, members, days, times) => {
   const overlay = create('div', 'overlay', null, main);
   const modal = create('div', 'modal', null, overlay);
-  const form = create('form', 'modal-form', null, modal);
+  const form = create('form', 'modal-form', null, modal, ['name', 'modal-form']);
 
   const titleContainer = create('div', 'modal-form_line', null, form);
   const memberContainer = create('div', 'modal-form_line', null, form);
@@ -30,15 +31,15 @@ const createPopUp = (main, members, days, times) => {
   const menuDays = create('div', 'menu', null, dayContainer, ['data-state', '']);
   const menuContentDays = create('div', 'menu__content', null, menuDays);
   const menuTitleDays = create('div', 'menu__title', null, menuDays, ['data-default', '']);
-  menuTitleMember.setAttribute('tab-index', '3');
-  createItemMember(days, menuTitleDays);
+  menuTitleDays.setAttribute('tab-index', '3');
+  createItemMember(days, menuContentDays);
 
   // Time input
   const menuTime = create('div', 'menu', null, timeContainer, ['data-state', '']);
   const menuContentTime = create('div', 'menu__content', null, menuTime);
   const menuTitleTime = create('div', 'menu__title', null, menuTime, ['data-default', '']);
-  menuTitleMember.setAttribute('tab-index', '4');
-  createItemMember(times, menuTitleTime);
+  menuTitleTime.setAttribute('tab-index', '4');
+  createItemMember(times, menuContentTime);
 
   // Buttons
   const btnSubmit = create('button', 'modal-form__btn submit-button state-0', null, buttonContainer, ['type', 'submit'], ['name', 'modal-form-submit'], ['tab-index', '5']);
@@ -60,17 +61,67 @@ const createPopUp = (main, members, days, times) => {
   };
 
   const updateButtonMsg = (event) => {
-    event.preventDefault();
+    // event.preventDefault();
     btnSubmit.classList.add('state-1', 'animated');
 
     setTimeout(finalButtonMsg, 2000);
   };
 
+  const message = {
+    loading: "img/form/original.svg",
+    succses: "Спасибо! Скоро мы с вами свяжемся!",
+    failure: "Что-то пошло не так"
+  };
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const member = {
+      "title": titleInput.value,
+      "participants": [menuTitleMember.textContent],
+      "day": menuTitleDays.textContent,
+      "time": menuTitleTime.textContent,
+      "complete": true,
+    };
+
+    console.log(titleInput.value, menuTitleMember.textContent, menuTitleDays.textContent, menuTitleTime.textContent);
+    // Data.getData().then((res) => res.json()).then(data => console.log(data));
+
+    // Data.sendData(arr)
+    //   .then(() => console.log('success'))
+    //   .catch(() => console.log('fail'));
+  });
+
   btnSubmit.addEventListener('click', updateButtonMsg);
 
-  overlay.addEventListener('click', ({ target }) => {
+  // Handle Input
+  overlay.addEventListener('click', (event) => {
+    const { target } = event;
+
+    if (target.classList.contains('cancel-button')) {
+      titleInput.value = '';
+      menuTitleMember.textContent = menuTitleMember.getAttribute('data-default');
+      menuTitleDays.textContent = menuTitleDays.getAttribute('data-default');
+      menuTitleTime.textContent = menuTitleTime.getAttribute('data-default');
+    }
+
     if (target.classList.contains('modal__close-btn') || target.classList.contains('overlay')) {
       main.removeChild(overlay);
+    }
+
+    if (target.classList.contains('menu__title')) {
+      // Toggle menu
+      if (target.parentElement.getAttribute('data-state') === 'active') {
+        target.parentElement.setAttribute('data-state', '');
+      } else {
+        target.parentElement.setAttribute('data-state', 'active');
+      }
+    }
+
+    if (target.classList.contains('menu__label')) {
+      // Close when click to input option
+      target.parentElement.nextElementSibling.textContent = target.textContent;
+
+      target.parentElement.parentElement.setAttribute('data-state', '');
     }
   });
 };
