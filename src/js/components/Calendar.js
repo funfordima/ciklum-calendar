@@ -1,8 +1,9 @@
 import create from '../utils/create';
 
 export default class Calendar {
-  constructor(members) {
+  constructor(members, url) {
     this.members = members;
+    this.url = url;
     this.root = document.getElementById('root');
     this.days = ['Name', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     this.timeLabels = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
@@ -36,11 +37,11 @@ export default class Calendar {
     });
   }
 
-  async getDataToDo() {
-    const response = await fetch('../src/db.json');
+  async getDataToDo(url) {
+    const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`Could not fetch url, status: ${response.status}`);
+      throw new Error(`Could not fetch ${url}, status: ${response.status}`);
     }
 
     const json = await response.json();
@@ -49,7 +50,7 @@ export default class Calendar {
   }
 
   async generateToDoItems(parentElement) {
-    const todos = await this.getDataToDo();
+    const todos = await this.getDataToDo(this.url);
     todos.forEach(({
       title,
       dataCol,

@@ -3,4 +3,4 @@ import './css/style.scss';
 
 const members = ['tamara', 'nick', 'ivan'];
 
-new Calendar(members).render();
+new Calendar(members, '../src/db.json').render();
