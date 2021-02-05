@@ -1,4 +1,6 @@
 import create from '../utils/create';
+import createPopUp from '../utils/createPopUp';
+import createItemMember from '../utils/createItemMember';
 
 export default class Calendar {
   constructor(urlToDoData, urlMembersData) {
@@ -22,7 +24,7 @@ export default class Calendar {
     const menuContent = create('div', 'menu__content', null, this.menu);
 
     this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', '']);
-    create('p', 'menu__container', this.menu, form);
+    create('div', 'menu__container', this.menu, form);
     create('input', 'event-btn-add', null, btnContainer, ['type', 'submit'], ['value', 'New Event +']);
     this.resetMenuBtn = create('input', 'event-btn-reset', null, btnContainer, ['type', 'reset'], ['value', 'Clear it!']);
     create('a', 'header__title_link', 'Calendar', headerTitle, ['href', '#'], ['alt', 'logo link']);
@@ -44,13 +46,7 @@ export default class Calendar {
 
   async generateMembers(parentElement) {
     this.members = await this.getData(this.urlMembersData);
-    this.members.forEach((member, indx) => {
-      const option = `
-        <input id='select_${indx}' class="menu__input" type="radio" name="select" />
-        <label for='select_${indx}' class="menu__label">${member}</label>
-      `;
-      parentElement.insertAdjacentHTML('beforeend', option);
-    });
+    createItemMember(this.members, parentElement);
   }
 
   /* eslint no-param-reassign: ["error", { "props": false }] */
@@ -157,11 +153,12 @@ export default class Calendar {
     this.handlerInputMembers();
   }
 
-  render() {
-    this.init();
+  async render() {
+    await this.init();
 
     // Handle Event
-    // this.contentContainer.addEventListener('click', (event) => {
-    // });
+    this.contentContainer.addEventListener('click', () => {
+      createPopUp(document.body, this.members, this.days, this.timeLabels);
+    });
   }
 }
