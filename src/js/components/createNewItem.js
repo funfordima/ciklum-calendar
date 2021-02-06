@@ -30,6 +30,9 @@ const createNewItem = (main, members, days, times, renderMainFunc) => {
   menuTitleMember.setAttribute('tab-index', '2');
   createItemMember(members, menuContentMember);
 
+  menuContentMember.querySelectorAll('input').forEach((inputEl) => inputEl.setAttribute('type', 'checkbox'));
+  menuContentMember.querySelectorAll('label').forEach((labelEl) => labelEl.classList.add('member'));
+
   // Day input
   const menuDays = create('div', 'menu', null, dayContainer, ['data-state', '']);
   const menuContentDays = create('div', 'menu__content', null, menuDays);
@@ -83,9 +86,9 @@ const createNewItem = (main, members, days, times, renderMainFunc) => {
 
     const minLengthInput = 2;
     const inputEvent = titleInput.value.trim();
-    const newMembers = menuTitleMember.textContent;
-    const newDay = menuTitleDays.textContent;
-    const newTime = menuTitleTime.textContent;
+    const newMembers = menuTitleMember.textContent.split(' ');
+    const newDay = menuTitleDays.textContent.trim();
+    const newTime = menuTitleTime.textContent.trim();
     let isLoad = false;
 
     // Check input
@@ -97,7 +100,7 @@ const createNewItem = (main, members, days, times, renderMainFunc) => {
         break;
       }
 
-      case (!newMembers): {
+      case (!newMembers.length): {
         const msg = errorMsg(message.noMember, form);
 
         setTimeout(() => form.removeChild(msg), 2000);
@@ -121,7 +124,7 @@ const createNewItem = (main, members, days, times, renderMainFunc) => {
       default: {
         const newEvent = {
           title: inputEvent,
-          participants: [newMembers],
+          participants: [...newMembers],
           day: newDay,
           time: newTime,
           complete: true,
@@ -196,10 +199,28 @@ const createNewItem = (main, members, days, times, renderMainFunc) => {
       }
     }
 
-    if (target.classList.contains('menu__label')) {
+    if (target.classList.contains('member')) {
+      const previousTitle = target.parentElement.nextElementSibling.textContent;
+      const nextTitle = target.textContent;
+
+      /* eslint prefer-const: 0 */
+      if (previousTitle.includes(nextTitle)) {
+        let previousArr = previousTitle.split(' ');
+        const indWillDelElem = previousTitle.split(' ').findIndex((el) => el === nextTitle);
+        previousArr.splice(indWillDelElem, 1);
+        target.parentElement.nextElementSibling.textContent = previousArr.join(' ');
+      } else {
+        target.parentElement.nextElementSibling.textContent += ` ${target.textContent}`;
+      }
+
       // Close when click to input option
+      target.parentElement.parentElement.setAttribute('data-state', '');
+    }
+
+    if (target.classList.contains('menu__label') && !target.classList.contains('member')) {
       target.parentElement.nextElementSibling.textContent = target.textContent;
 
+      // Close when click to input option
       target.parentElement.parentElement.setAttribute('data-state', '');
     }
   });

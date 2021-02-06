@@ -195,6 +195,7 @@ export default class Calendar {
       createNewItem(document.body, this.members, this.days, this.timeLabels, () => {
         const eventsList = JSON.parse(localStorage.getItem('events'));
         this.generateToDoItems(eventsList);
+        this.todos = eventsList;
       });
     });
   }
