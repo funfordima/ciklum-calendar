@@ -1,6 +1,7 @@
 import create from './create';
 import createItemMember from './createItemMember';
 import Data from './data';
+import { URL_EVENTS } from '../constants/constants';
 
 const createPopUp = (main, members, days, times) => {
   const overlay = create('div', 'overlay', null, main);
@@ -75,7 +76,7 @@ const createPopUp = (main, members, days, times) => {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const member = {
+    const newEvent = {
       "title": titleInput.value,
       "participants": [menuTitleMember.textContent],
       "day": menuTitleDays.textContent,
@@ -83,12 +84,30 @@ const createPopUp = (main, members, days, times) => {
       "complete": true,
     };
 
-    console.log(titleInput.value, menuTitleMember.textContent, menuTitleDays.textContent, menuTitleTime.textContent);
-    // Data.getData().then((res) => res.json()).then(data => console.log(data));
+    const events = JSON.parse(localStorage.getItem('events'));
+    const newEvents = events.map((eventItem) => {
+      const { day, time, title } = eventItem;
+      const condition = menuTitleDays.textContent === day && menuTitleTime.textContent === time;
 
-    // Data.sendData(arr)
-    //   .then(() => console.log('success'))
-    //   .catch(() => console.log('fail'));
+      if (condition && titleInput.value === title) {
+        console.log('slot doesn"t free');
+        return eventItem;
+      } else if (condition && titleInput.value !== title) {
+        console.log('change item');
+        return newEvent;
+      } else {
+        return eventItem;
+      }
+    });
+
+    Data.sendData(URL_EVENTS, newEvents)
+      .then(() => {
+        console.log('success');
+        localStorage.setItem('events', JSON.stringify(newEvents));
+      })
+      .catch(() => {
+        console.log('fail');
+      });
   });
 
   btnSubmit.addEventListener('click', updateButtonMsg);

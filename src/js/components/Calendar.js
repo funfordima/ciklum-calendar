@@ -49,7 +49,7 @@ export default class Calendar {
     this.members = this.members[Object.keys(this.members)[Object.keys(this.members).length - 1]];
     localStorage.setItem('members', JSON.stringify(this.members));
 
-    // this.todos = await this.getData(this.urlToDoData);
+    // this.todos = await this.getData('../src/db.json');
     // console.log(this.todos);
 
     // Data.sendData(URL_EVENTS, this.todos)
@@ -65,11 +65,9 @@ export default class Calendar {
     parentElement.innerHTML = '';
     this.todos.forEach(({
       title,
-      dataCol,
-      dataRow,
       complete,
     }) => {
-      const todoContainer = create('div', 'main__item', null, parentElement, ['data-col', dataCol], ['data-row', dataRow], ['data-complete', complete]);
+      const todoContainer = create('div', 'main__item', null, parentElement, ['data-complete', complete]);
       create('h3', 'main__item_title', title, todoContainer);
       create('div', 'main__item_btn-close', '&times;', todoContainer);
     });
