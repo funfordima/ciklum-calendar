@@ -3,6 +3,7 @@ import createPopUp from '../utils/createPopUp';
 import createItemMember from '../utils/createItemMember';
 import { URL_EVENTS, URL_MEMBERS } from '../constants/constants';
 import Data from '../utils/data';
+import { successMsg, errorMsg } from './statusMsg';
 
 export default class Calendar {
   constructor() {
@@ -66,8 +67,10 @@ export default class Calendar {
     this.todos.forEach(({
       title,
       complete,
+      day,
+      time,
     }) => {
-      const todoContainer = create('div', 'main__item', null, parentElement, ['data-complete', complete]);
+      const todoContainer = create('div', 'main__item', null, parentElement, ['data-complete', complete], ['data-day', day], ['data-time', time]);
       create('h3', 'main__item_title', title, todoContainer);
       create('div', 'main__item_btn-close', '&times;', todoContainer);
     });
@@ -154,6 +157,43 @@ export default class Calendar {
     });
   }
 
+  handlerDeleteEvent(el) {
+    let isLoad = false;
+    const eventDay = el.dataset.day;
+    const eventTime = el.dataset.time;
+    const newEvent = {
+      title: '',
+      participants: [''],
+      day: eventDay,
+      time: eventTime,
+      complete: false,
+    };
+
+    this.todos = this.todos.map((todo) => {
+      if (todo.time === eventTime && todo.day === eventDay) {
+        isLoad = true;
+        return newEvent;
+      }
+
+      return todo;
+    });
+
+    isLoad && Data.sendData(URL_EVENTS, this.todos)
+      .then(() => {
+        localStorage.setItem('events', JSON.stringify(this.todos));
+        const msg = successMsg('Готово!', this.root);
+        // Rerender ItemToDo
+        this.generateToDoItems(this.contentContainer);
+
+        setTimeout(() => this.root.removeChild(msg), 2000);
+      })
+      .catch((error) => {
+        const msg = errorMsg(error.message, this.root);
+
+        setTimeout(() => this.root.removeChild(msg), 2000);
+      });
+  }
+
   async init() {
     this.todos = await Data.getData(URL_EVENTS);
     this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
@@ -169,8 +209,16 @@ export default class Calendar {
     await this.init();
 
     // Handle Event
-    this.contentContainer.addEventListener('click', () => {
-      console.log('hello');
+    this.contentContainer.addEventListener('click', (event) => {
+      const { target } = event;
+
+      if (target.classList.contains('main__item_btn-close')) {
+        console.log('hello');
+
+        const answer = confirm('Вы уверены, что хотите удалить этот ивент?', false);
+
+        answer && this.handlerDeleteEvent(target.parentElement);
+      }
     });
 
     this.btnAddItem.addEventListener('click', (e) => {
