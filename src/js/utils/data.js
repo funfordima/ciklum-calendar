@@ -4,10 +4,10 @@ export default class Data {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
-        'Content-type': 'application/json'
-      }
+        'Content-type': 'application/json',
+      },
     })
-      .catch((err) => console.log(err.message));
+      .catch((err) => console.error(err.message));
   }
 
   static async getData(url) {
