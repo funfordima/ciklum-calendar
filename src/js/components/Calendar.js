@@ -128,7 +128,7 @@ export default class Calendar {
         }
 
         default: {
-          console.warn('something went wrong');
+          console.error('something went wrong');
         }
       }
     });
