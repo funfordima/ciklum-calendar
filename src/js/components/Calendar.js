@@ -33,28 +33,10 @@ export default class Calendar {
     return menuContent;
   }
 
-  async getData(url) {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Could not fetch ${url}, status: ${response.status}`);
-    }
-
-    const json = await response.json();
-
-    return json;
-  }
-
   async generateMembers(parentElement) {
     this.members = await Data.getData(URL_MEMBERS);
     this.members = this.members[Object.keys(this.members)[Object.keys(this.members).length - 1]];
     localStorage.setItem('members', JSON.stringify(this.members));
-
-    // this.todos = await this.getData('../src/db.json');
-    // console.log(this.todos);
-
-    // Data.sendData(URL_EVENTS, this.todos)
-    //   .then(() => console.log('success'));
 
     createItemMember(this.members, parentElement);
     document.querySelectorAll('.menu__content input').forEach((el, indx) => el.setAttribute('id', `${this.members[indx]}_header`));
@@ -62,15 +44,15 @@ export default class Calendar {
   }
 
   /* eslint no-param-reassign: ["error", { "props": false }] */
-  async generateToDoItems(parentElement) {
-    parentElement.innerHTML = '';
-    this.todos.forEach(({
+  async generateToDoItems(todoList) {
+    this.contentContainer.innerHTML = '';
+    todoList.forEach(({
       title,
       complete,
       day,
       time,
     }) => {
-      const todoContainer = create('div', 'main__item', null, parentElement, ['data-complete', complete], ['data-day', day], ['data-time', time]);
+      const todoContainer = create('div', 'main__item', null, this.contentContainer, ['data-complete', complete], ['data-day', day], ['data-time', time]);
       create('h3', 'main__item_title', title, todoContainer);
       create('div', 'main__item_btn-close', '&times;', todoContainer);
     });
@@ -90,70 +72,40 @@ export default class Calendar {
       create('div', 'main__item', timeItem, columnContainer);
     });
 
-    this.generateToDoItems(this.contentContainer);
+    this.generateToDoItems(this.todos);
   }
 
   handlerInputMembers() {
     this.menu.addEventListener('click', ({ target }) => {
-      switch (true) {
-        case (target.classList.contains('menu__title')): {
-          // Toggle menu
-          if (this.menu.getAttribute('data-state') === 'active') {
-            this.menu.setAttribute('data-state', '');
-          } else {
-            this.menu.setAttribute('data-state', 'active');
-          }
-
-          break;
-        }
-
-        case (target.classList.contains('menu__label')): {
-          // Close when click to input option
-          this.menuTitle.textContent = target.textContent;
+      if (target.classList.contains('menu__title')) {
+        // Toggle menu
+        if (this.menu.getAttribute('data-state') === 'active') {
           this.menu.setAttribute('data-state', '');
-
-          // Filter ItemToDo
-          const filterCondition = this.menuTitle.textContent;
-          this.todos.map((todo) => {
-            if (!todo.participants.includes(filterCondition)) {
-              todo.complete = false;
-            } else {
-              todo.complete = true;
-            }
-
-            return todo;
-          });
-
-          // Rerender ItemToDo
-          this.generateToDoItems(this.contentContainer);
-
-          break;
-        }
-
-        default: {
-          console.error('something went wrong');
+        } else {
+          this.menu.setAttribute('data-state', 'active');
         }
       }
-    });
 
-    // Reset title
-    this.resetMenuBtn.addEventListener('click', () => {
-      this.menuTitle.textContent = this.menuTitle.getAttribute('data-default');
+      if (target.classList.contains('menu__label')) {
+        // Close when click to input option
+        this.menuTitle.textContent = target.textContent;
+        this.menu.setAttribute('data-state', '');
 
-      this.todos.map((todo) => {
-        todo.participants.forEach((member) => {
-          if (this.members.includes(member)) {
-            todo.complete = true;
-          } else {
+        // Filter ItemToDo
+        const filterCondition = this.menuTitle.textContent;
+        this.todos.map((todo) => {
+          if (!todo.participants.includes(filterCondition)) {
             todo.complete = false;
+          } else {
+            todo.complete = true;
           }
+
+          return todo;
         });
 
-        return todo;
-      });
-
-      // Rerender ItemToDo
-      this.generateToDoItems(this.contentContainer);
+        // Rerender ItemToDo
+        this.generateToDoItems(this.todos);
+      }
     });
   }
 
@@ -183,7 +135,7 @@ export default class Calendar {
         localStorage.setItem('events', JSON.stringify(this.todos));
         const msg = successMsg('Готово!', this.root);
         // Rerender ItemToDo
-        this.generateToDoItems(this.contentContainer);
+        this.generateToDoItems(this.todos);
 
         setTimeout(() => this.root.removeChild(msg), 2000);
       })
@@ -208,22 +160,43 @@ export default class Calendar {
   async render() {
     await this.init();
 
-    // Handle Event
+    // Handle Delete Event
     this.contentContainer.addEventListener('click', (event) => {
       const { target } = event;
 
       if (target.classList.contains('main__item_btn-close')) {
-        console.log('hello');
-
         const answer = confirm('Вы уверены, что хотите удалить этот ивент?', false);
 
         answer && this.handlerDeleteEvent(target.parentElement);
       }
     });
 
+    // Reset title
+    this.resetMenuBtn.addEventListener('click', () => {
+      this.menuTitle.textContent = this.menuTitle.getAttribute('data-default');
+
+      this.todos.map((todo) => {
+        todo.participants.forEach((member) => {
+          if (this.members.includes(member)) {
+            todo.complete = true;
+          } else {
+            todo.complete = false;
+          }
+        });
+
+        return todo;
+      });
+
+      // Rerender ItemToDo
+      this.generateToDoItems(this.todos);
+    });
+
     this.btnAddItem.addEventListener('click', (e) => {
       e.preventDefault();
-      createPopUp(document.body, this.members, this.days, this.timeLabels);
+      createPopUp(document.body, this.members, this.days, this.timeLabels, () => {
+        const eventsList = JSON.parse(localStorage.getItem('events'));
+        this.generateToDoItems(eventsList);
+      });
     });
   }
 }

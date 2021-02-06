@@ -4,7 +4,7 @@ import Data from './data';
 import { URL_EVENTS } from '../constants/constants';
 import { successMsg, errorMsg } from '../components/statusMsg';
 
-const createPopUp = (main, members, days, times) => {
+const createPopUp = (main, members, days, times, renderMainFunc) => {
   const overlay = create('div', 'overlay', null, main);
   const modal = create('div', 'modal', null, overlay);
   const form = create('form', 'modal-form', null, modal, ['name', 'modal-form']);
@@ -81,12 +81,12 @@ const createPopUp = (main, members, days, times) => {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    let isLoad = false;
     const minLengthInput = 2;
     const inputEvent = titleInput.value.trim();
     const newMembers = menuTitleMember.textContent;
     const newDay = menuTitleDays.textContent;
     const newTime = menuTitleTime.textContent;
+    let isLoad = false;
 
     // Check input
     switch (true) {
@@ -150,6 +150,7 @@ const createPopUp = (main, members, days, times) => {
             .then(() => {
               localStorage.setItem('events', JSON.stringify(newEvents));
               const msg = successMsg(message.success, form);
+              renderMainFunc();
 
               setTimeout(() => form.removeChild(msg), 2000);
             })
