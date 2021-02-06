@@ -5,6 +5,7 @@ import { URL_EVENTS, URL_MEMBERS } from '../constants/constants';
 import Data from '../utils/data';
 import { successMsg, errorMsg } from './statusMsg';
 import createModalDialog from '../utils/createModalDialog';
+import createFooter from './createFooter';
 
 export default class Calendar {
   constructor() {
@@ -157,6 +158,7 @@ export default class Calendar {
     const memebersListContainer = this.createHeader();
     this.generateMembers(memebersListContainer);
     this.createMain();
+    createFooter(this.root);
     this.handlerInputMembers();
   }
 
