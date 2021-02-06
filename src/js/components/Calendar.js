@@ -1,9 +1,10 @@
 import create from '../utils/create';
-import createPopUp from '../utils/createPopUp';
+import createNewItem from './createNewItem';
 import createItemMember from '../utils/createItemMember';
 import { URL_EVENTS, URL_MEMBERS } from '../constants/constants';
 import Data from '../utils/data';
 import { successMsg, errorMsg } from './statusMsg';
+import createModalDialog from '../utils/createModalDialog';
 
 export default class Calendar {
   constructor() {
@@ -130,20 +131,22 @@ export default class Calendar {
       return todo;
     });
 
-    isLoad && Data.sendData(URL_EVENTS, this.todos)
-      .then(() => {
-        localStorage.setItem('events', JSON.stringify(this.todos));
-        const msg = successMsg('Готово!', this.root);
-        // Rerender ItemToDo
-        this.generateToDoItems(this.todos);
+    if (isLoad) {
+      Data.sendData(URL_EVENTS, this.todos)
+        .then(() => {
+          localStorage.setItem('events', JSON.stringify(this.todos));
+          const msg = successMsg('Готово!', this.root);
+          // Rerender ItemToDo
+          this.generateToDoItems(this.todos);
 
-        setTimeout(() => this.root.removeChild(msg), 2000);
-      })
-      .catch((error) => {
-        const msg = errorMsg(error.message, this.root);
+          setTimeout(() => this.root.removeChild(msg), 2000);
+        })
+        .catch((error) => {
+          const msg = errorMsg(error.message, this.root);
 
-        setTimeout(() => this.root.removeChild(msg), 2000);
-      });
+          setTimeout(() => this.root.removeChild(msg), 2000);
+        });
+    }
   }
 
   async init() {
@@ -161,13 +164,9 @@ export default class Calendar {
     await this.init();
 
     // Handle Delete Event
-    this.contentContainer.addEventListener('click', (event) => {
-      const { target } = event;
-
+    this.contentContainer.addEventListener('click', ({ target }) => {
       if (target.classList.contains('main__item_btn-close')) {
-        const answer = confirm('Вы уверены, что хотите удалить этот ивент?', false);
-
-        answer && this.handlerDeleteEvent(target.parentElement);
+        createModalDialog(this.root, 'Вы уверены, что хотите удалить этот ивент?', this.handlerDeleteEvent.bind(this, target.parentElement));
       }
     });
 
@@ -193,7 +192,7 @@ export default class Calendar {
 
     this.btnAddItem.addEventListener('click', (e) => {
       e.preventDefault();
-      createPopUp(document.body, this.members, this.days, this.timeLabels, () => {
+      createNewItem(document.body, this.members, this.days, this.timeLabels, () => {
         const eventsList = JSON.parse(localStorage.getItem('events'));
         this.generateToDoItems(eventsList);
       });

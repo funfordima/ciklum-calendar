@@ -1,10 +1,10 @@
-import create from './create';
-import createItemMember from './createItemMember';
-import Data from './data';
+import create from '../utils/create';
+import createItemMember from '../utils/createItemMember';
+import Data from '../utils/data';
 import { URL_EVENTS } from '../constants/constants';
-import { successMsg, errorMsg } from '../components/statusMsg';
+import { successMsg, errorMsg } from './statusMsg';
 
-const createPopUp = (main, members, days, times, renderMainFunc) => {
+const createNewItem = (main, members, days, times, renderMainFunc) => {
   const overlay = create('div', 'overlay', null, main);
   const modal = create('div', 'modal', null, overlay);
   const form = create('form', 'modal-form', null, modal, ['name', 'modal-form']);
@@ -205,4 +205,4 @@ const createPopUp = (main, members, days, times, renderMainFunc) => {
   });
 };
 
-export default createPopUp;
+export default createNewItem;

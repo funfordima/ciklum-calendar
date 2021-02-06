@@ -338,6 +338,14 @@ html {
   z-index: 13;
   transition: all 3s ease;
 
+  &.msg {
+    margin: 0 auto;
+    width: 300px;
+    height: fit-content;
+    top: 5%;
+    flex-direction: column;
+  }
+
   &-form {
     width: 100%;
     display: flex;
