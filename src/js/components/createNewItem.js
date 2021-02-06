@@ -1,10 +1,10 @@
-import create from './create';
-import createItemMember from './createItemMember';
-import Data from './data';
+import create from '../utils/create';
+import createItemMember from '../utils/createItemMember';
+import Data from '../utils/data';
 import { URL_EVENTS } from '../constants/constants';
-import { successMsg, errorMsg } from '../components/statusMsg';
+import { successMsg, errorMsg } from './statusMsg';
 
-const createPopUp = (main, members, days, times) => {
+const createNewItem = (main, members, days, times, renderMainFunc) => {
   const overlay = create('div', 'overlay', null, main);
   const modal = create('div', 'modal', null, overlay);
   const form = create('form', 'modal-form', null, modal, ['name', 'modal-form']);
@@ -29,6 +29,9 @@ const createPopUp = (main, members, days, times) => {
   const menuTitleMember = create('div', 'menu__title', null, menuMember, ['data-default', '']);
   menuTitleMember.setAttribute('tab-index', '2');
   createItemMember(members, menuContentMember);
+
+  menuContentMember.querySelectorAll('input').forEach((inputEl) => inputEl.setAttribute('type', 'checkbox'));
+  menuContentMember.querySelectorAll('label').forEach((labelEl) => labelEl.classList.add('member'));
 
   // Day input
   const menuDays = create('div', 'menu', null, dayContainer, ['data-state', '']);
@@ -81,12 +84,12 @@ const createPopUp = (main, members, days, times) => {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    let isLoad = false;
     const minLengthInput = 2;
     const inputEvent = titleInput.value.trim();
-    const newMembers = menuTitleMember.textContent;
-    const newDay = menuTitleDays.textContent;
-    const newTime = menuTitleTime.textContent;
+    const newMembers = menuTitleMember.textContent.split(' ');
+    const newDay = menuTitleDays.textContent.trim();
+    const newTime = menuTitleTime.textContent.trim();
+    let isLoad = false;
 
     // Check input
     switch (true) {
@@ -97,7 +100,7 @@ const createPopUp = (main, members, days, times) => {
         break;
       }
 
-      case (!newMembers): {
+      case (!newMembers.length): {
         const msg = errorMsg(message.noMember, form);
 
         setTimeout(() => form.removeChild(msg), 2000);
@@ -121,7 +124,7 @@ const createPopUp = (main, members, days, times) => {
       default: {
         const newEvent = {
           title: inputEvent,
-          participants: [newMembers],
+          participants: [...newMembers],
           day: newDay,
           time: newTime,
           complete: true,
@@ -150,6 +153,7 @@ const createPopUp = (main, members, days, times) => {
             .then(() => {
               localStorage.setItem('events', JSON.stringify(newEvents));
               const msg = successMsg(message.success, form);
+              renderMainFunc();
 
               setTimeout(() => form.removeChild(msg), 2000);
             })
@@ -195,13 +199,31 @@ const createPopUp = (main, members, days, times) => {
       }
     }
 
-    if (target.classList.contains('menu__label')) {
+    if (target.classList.contains('member')) {
+      const previousTitle = target.parentElement.nextElementSibling.textContent;
+      const nextTitle = target.textContent;
+
+      /* eslint prefer-const: 0 */
+      if (previousTitle.includes(nextTitle)) {
+        let previousArr = previousTitle.split(' ');
+        const indWillDelElem = previousTitle.split(' ').findIndex((el) => el === nextTitle);
+        previousArr.splice(indWillDelElem, 1);
+        target.parentElement.nextElementSibling.textContent = previousArr.join(' ');
+      } else {
+        target.parentElement.nextElementSibling.textContent += ` ${target.textContent}`;
+      }
+
       // Close when click to input option
+      target.parentElement.parentElement.setAttribute('data-state', '');
+    }
+
+    if (target.classList.contains('menu__label') && !target.classList.contains('member')) {
       target.parentElement.nextElementSibling.textContent = target.textContent;
 
+      // Close when click to input option
       target.parentElement.parentElement.setAttribute('data-state', '');
     }
   });
 };
 
-export default createPopUp;
+export default createNewItem;

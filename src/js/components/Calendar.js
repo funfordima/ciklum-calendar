@@ -1,8 +1,10 @@
 import create from '../utils/create';
-import createPopUp from '../utils/createPopUp';
+import createNewItem from './createNewItem';
 import createItemMember from '../utils/createItemMember';
 import { URL_EVENTS, URL_MEMBERS } from '../constants/constants';
 import Data from '../utils/data';
+import { successMsg, errorMsg } from './statusMsg';
+import createModalDialog from '../utils/createModalDialog';
 
 export default class Calendar {
   constructor() {
@@ -32,28 +34,10 @@ export default class Calendar {
     return menuContent;
   }
 
-  async getData(url) {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Could not fetch ${url}, status: ${response.status}`);
-    }
-
-    const json = await response.json();
-
-    return json;
-  }
-
   async generateMembers(parentElement) {
     this.members = await Data.getData(URL_MEMBERS);
     this.members = this.members[Object.keys(this.members)[Object.keys(this.members).length - 1]];
     localStorage.setItem('members', JSON.stringify(this.members));
-
-    // this.todos = await this.getData('../src/db.json');
-    // console.log(this.todos);
-
-    // Data.sendData(URL_EVENTS, this.todos)
-    //   .then(() => console.log('success'));
 
     createItemMember(this.members, parentElement);
     document.querySelectorAll('.menu__content input').forEach((el, indx) => el.setAttribute('id', `${this.members[indx]}_header`));
@@ -61,13 +45,15 @@ export default class Calendar {
   }
 
   /* eslint no-param-reassign: ["error", { "props": false }] */
-  async generateToDoItems(parentElement) {
-    parentElement.innerHTML = '';
-    this.todos.forEach(({
+  async generateToDoItems(todoList) {
+    this.contentContainer.innerHTML = '';
+    todoList.forEach(({
       title,
       complete,
+      day,
+      time,
     }) => {
-      const todoContainer = create('div', 'main__item', null, parentElement, ['data-complete', complete]);
+      const todoContainer = create('div', 'main__item', null, this.contentContainer, ['data-complete', complete], ['data-day', day], ['data-time', time]);
       create('h3', 'main__item_title', title, todoContainer);
       create('div', 'main__item_btn-close', '&times;', todoContainer);
     });
@@ -87,49 +73,100 @@ export default class Calendar {
       create('div', 'main__item', timeItem, columnContainer);
     });
 
-    this.generateToDoItems(this.contentContainer);
+    this.generateToDoItems(this.todos);
   }
 
   handlerInputMembers() {
     this.menu.addEventListener('click', ({ target }) => {
-      switch (true) {
-        case (target.classList.contains('menu__title')): {
-          // Toggle menu
-          if (this.menu.getAttribute('data-state') === 'active') {
-            this.menu.setAttribute('data-state', '');
+      if (target.classList.contains('menu__title')) {
+        // Toggle menu
+        if (this.menu.getAttribute('data-state') === 'active') {
+          this.menu.setAttribute('data-state', '');
+        } else {
+          this.menu.setAttribute('data-state', 'active');
+        }
+      }
+
+      if (target.classList.contains('menu__label')) {
+        // Close when click to input option
+        this.menuTitle.textContent = target.textContent;
+        this.menu.setAttribute('data-state', '');
+
+        // Filter ItemToDo
+        const filterCondition = this.menuTitle.textContent;
+        this.todos.map((todo) => {
+          if (!todo.participants.includes(filterCondition)) {
+            todo.complete = false;
           } else {
-            this.menu.setAttribute('data-state', 'active');
+            todo.complete = true;
           }
 
-          break;
-        }
+          return todo;
+        });
 
-        case (target.classList.contains('menu__label')): {
-          // Close when click to input option
-          this.menuTitle.textContent = target.textContent;
-          this.menu.setAttribute('data-state', '');
+        // Rerender ItemToDo
+        this.generateToDoItems(this.todos);
+      }
+    });
+  }
 
-          // Filter ItemToDo
-          const filterCondition = this.menuTitle.textContent;
-          this.todos.map((todo) => {
-            if (!todo.participants.includes(filterCondition)) {
-              todo.complete = false;
-            } else {
-              todo.complete = true;
-            }
+  handlerDeleteEvent(el) {
+    let isLoad = false;
+    const eventDay = el.dataset.day;
+    const eventTime = el.dataset.time;
+    const newEvent = {
+      title: '',
+      participants: [''],
+      day: eventDay,
+      time: eventTime,
+      complete: false,
+    };
 
-            return todo;
-          });
+    this.todos = this.todos.map((todo) => {
+      if (todo.time === eventTime && todo.day === eventDay) {
+        isLoad = true;
+        return newEvent;
+      }
 
+      return todo;
+    });
+
+    if (isLoad) {
+      Data.sendData(URL_EVENTS, this.todos)
+        .then(() => {
+          localStorage.setItem('events', JSON.stringify(this.todos));
+          const msg = successMsg('Готово!', this.root);
           // Rerender ItemToDo
-          this.generateToDoItems(this.contentContainer);
+          this.generateToDoItems(this.todos);
 
-          break;
-        }
+          setTimeout(() => this.root.removeChild(msg), 2000);
+        })
+        .catch((error) => {
+          const msg = errorMsg(error.message, this.root);
 
-        default: {
-          console.error('something went wrong');
-        }
+          setTimeout(() => this.root.removeChild(msg), 2000);
+        });
+    }
+  }
+
+  async init() {
+    this.todos = await Data.getData(URL_EVENTS);
+    this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
+    localStorage.setItem('events', JSON.stringify(this.todos));
+
+    const memebersListContainer = this.createHeader();
+    this.generateMembers(memebersListContainer);
+    this.createMain();
+    this.handlerInputMembers();
+  }
+
+  async render() {
+    await this.init();
+
+    // Handle Delete Event
+    this.contentContainer.addEventListener('click', ({ target }) => {
+      if (target.classList.contains('main__item_btn-close')) {
+        createModalDialog(this.root, 'Вы уверены, что хотите удалить этот ивент?', this.handlerDeleteEvent.bind(this, target.parentElement));
       }
     });
 
@@ -150,32 +187,16 @@ export default class Calendar {
       });
 
       // Rerender ItemToDo
-      this.generateToDoItems(this.contentContainer);
-    });
-  }
-
-  async init() {
-    this.todos = await Data.getData(URL_EVENTS);
-    this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
-    localStorage.setItem('events', JSON.stringify(this.todos));
-
-    const memebersListContainer = this.createHeader();
-    this.generateMembers(memebersListContainer);
-    this.createMain();
-    this.handlerInputMembers();
-  }
-
-  async render() {
-    await this.init();
-
-    // Handle Event
-    this.contentContainer.addEventListener('click', () => {
-      console.log('hello');
+      this.generateToDoItems(this.todos);
     });
 
     this.btnAddItem.addEventListener('click', (e) => {
       e.preventDefault();
-      createPopUp(document.body, this.members, this.days, this.timeLabels);
+      createNewItem(document.body, this.members, this.days, this.timeLabels, () => {
+        const eventsList = JSON.parse(localStorage.getItem('events'));
+        this.generateToDoItems(eventsList);
+        this.todos = eventsList;
+      });
     });
   }
 }

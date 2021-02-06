@@ -200,13 +200,14 @@ html {
     height: 40px;
     max-height: 0;
     padding: 0 16px;
+    background-color: #fff;
     transition: all 0.2s ease-out;
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
 
     & + input + & {
-      border-top: 0 solid #c7ccd160;
+      border-top: 0 solid #c7ccd1;
     }
 
     &:hover {
@@ -337,6 +338,14 @@ html {
   border: 2px solid #979797;
   z-index: 13;
   transition: all 3s ease;
+
+  &.msg {
+    margin: 0 auto;
+    width: 300px;
+    height: fit-content;
+    top: 5%;
+    flex-direction: column;
+  }
 
   &-form {
     width: 100%;

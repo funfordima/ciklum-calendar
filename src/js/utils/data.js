@@ -7,7 +7,9 @@ export default class Data {
         'Content-type': 'application/json',
       },
     })
-      .catch((err) => console.error(err.message));
+      .catch((err) => {
+        throw new Error(`Could not fetch, message: ${err.message}`);
+      });
   }
 
   static async getData(url) {
