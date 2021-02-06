@@ -22,6 +22,10 @@ html {
   padding: 0 3rem;
   width: 100%;
   max-width: 1200px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
   background-color: #fafafa;
 }
 
@@ -535,5 +539,70 @@ html {
     background-size: 24px 24px;
     background-repeat: no-repeat;
     background-position: center center;
+  }
+}
+
+.footer {
+  height: 77px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0.5em;
+  flex: 0 0 auto;
+  &__school {
+    & a {
+      display: flex;
+      align-items: center;
+      line-height: 1;
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    & a:hover {
+      opacity: 0.9;
+    }
+
+    & svg {
+      height: 2rem;
+      margin-right: 1rem;
+      transition: 0.3s;
+    }
+  }
+}
+
+.author {
+  padding: 1rem;
+
+  &__container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  & svg {
+    width: 2rem;
+    height: 2rem;
+    margin-left: 1rem;
+    transition: 0.3s;
+    cursor: pointer;
+
+    & path {
+      fill: #fff;
+    }
+  }
+
+  & a {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  & a:hover {
+    opacity: 0.9;
   }
 }
