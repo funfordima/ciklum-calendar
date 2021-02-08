@@ -28,8 +28,10 @@ export default class Calendar {
 
     this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', '']);
     create('div', 'menu__container', this.menu, form);
-    this.btnAddItem = create('input', 'event-btn-add', null, btnContainer, ['type', 'submit'], ['value', 'New Event +']);
-    this.resetMenuBtn = create('input', 'event-btn-reset', null, btnContainer, ['type', 'reset'], ['value', 'Clear it!']);
+    this.btnAddItem = create('input', 'event-btn-add', null, btnContainer,
+      ['type', 'submit'], ['value', 'New Event +']);
+    this.resetMenuBtn = create('input', 'event-btn-reset', null, btnContainer,
+      ['type', 'reset'], ['value', 'Clear it!']);
     create('a', 'header__title_link', 'Calendar', headerTitle, ['href', '#'], ['alt', 'logo link']);
 
     return menuContent;
@@ -41,8 +43,10 @@ export default class Calendar {
     localStorage.setItem('members', JSON.stringify(this.members));
 
     createItemMember(this.members, parentElement);
-    document.querySelectorAll('.menu__content input').forEach((el, indx) => el.setAttribute('id', `${this.members[indx]}_header`));
-    document.querySelectorAll('.menu__content label').forEach((el, indx) => el.setAttribute('for', `${this.members[indx]}_header`));
+    document.querySelectorAll('.menu__content input')
+      .forEach((el, indx) => el.setAttribute('id', `${this.members[indx]}_header`));
+    document.querySelectorAll('.menu__content label')
+      .forEach((el, indx) => el.setAttribute('for', `${this.members[indx]}_header`));
   }
 
   /* eslint no-param-reassign: ["error", { "props": false }] */
@@ -53,8 +57,10 @@ export default class Calendar {
       complete,
       day,
       time,
+      participants,
     }) => {
-      const todoContainer = create('div', 'main__item', null, this.contentContainer, ['data-complete', complete], ['data-day', day], ['data-time', time]);
+      const todoContainer = create('div', 'main__item', null, this.contentContainer,
+        ['data-complete', complete], ['data-day', day], ['data-time', time], ['title', participants.join(' ')]);
       create('h3', 'main__item_title', title, todoContainer);
       create('div', 'main__item_btn-close', '&times;', todoContainer);
     });
@@ -169,18 +175,8 @@ export default class Calendar {
     this.contentContainer.addEventListener('click', ({ target }) => {
       if (target.classList.contains('main__item_btn-close')) {
         const eventTitle = target.previousElementSibling.textContent;
-        createModalDialog(this.root, `Вы уверены, что хотите удалить ивент ${eventTitle}?`, this.handlerDeleteEvent.bind(this, target.parentElement));
-      }
-    });
-
-    // Handle Change Event
-    this.contentContainer.addEventListener('dblclick', ({ target }) => {
-      if (target.classList.contains('main__item') || target.classList.contains('main__item_title')) {
-        createNewItem(document.body, this.members, this.days, this.timeLabels, () => {
-          const eventsList = JSON.parse(localStorage.getItem('events'));
-          this.generateToDoItems(eventsList);
-          this.todos = eventsList;
-        }, true);
+        createModalDialog(this.root, `Вы уверены, что хотите удалить ивент ${eventTitle}?`,
+          this.handlerDeleteEvent.bind(this, target.parentElement));
       }
     });
 

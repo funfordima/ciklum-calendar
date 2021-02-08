@@ -21,7 +21,8 @@ const createNewItem = (main, members, days, times, renderMainFunc, isReplace = f
   create('p', 'modal-form_label', 'Day', dayContainer);
   create('p', 'modal-form_label', 'Time', timeContainer);
 
-  const titleInput = create('input', 'modal-form__input', null, titleContainer, ['type', 'text'], ['tab-index', '1'], ['name', 'eventName'], ['placeholder', 'Event']);
+  const titleInput = create('input', 'modal-form__input', null, titleContainer,
+    ['type', 'text'], ['tab-index', '1'], ['name', 'eventName'], ['placeholder', 'Event']);
 
   // Members input
   const menuMember = create('div', 'menu', null, memberContainer, ['data-state', '']);
@@ -48,8 +49,10 @@ const createNewItem = (main, members, days, times, renderMainFunc, isReplace = f
   createItemMember(times, menuContentTime);
 
   // Buttons
-  const btnSubmit = create('button', 'modal-form__btn submit-button state-0', null, buttonContainer, ['type', 'submit'], ['name', 'modal-form-submit'], ['tab-index', '5']);
-  create('input', 'modal-form__btn cancel-button', null, buttonContainer, ['type', 'button'], ['value', 'Cancel'], ['name', 'modal-form-cancel'], ['tab-index', '6']);
+  const btnSubmit = create('button', 'modal-form__btn submit-button state-0', null, buttonContainer,
+    ['type', 'submit'], ['name', 'modal-form-submit'], ['tab-index', '5']);
+  create('input', 'modal-form__btn cancel-button', null, buttonContainer,
+    ['type', 'button'], ['value', 'Cancel'], ['name', 'modal-form-cancel'], ['tab-index', '6']);
   create('button', 'modal__close-btn', '&times', modal, ['type', 'button'], ['tab-index', '7']);
   create('span', 'pre-state-msg', 'Submit', btnSubmit);
   create('span', 'current-state-msg hide', 'Sending...', btnSubmit);
@@ -164,7 +167,10 @@ const createNewItem = (main, members, days, times, renderMainFunc, isReplace = f
               const msg = successMsg(message.success, form);
               renderMainFunc();
 
-              setTimeout(() => form.removeChild(msg), 2000);
+              setTimeout(() => {
+                form.removeChild(msg);
+                main.removeChild(overlay);
+              }, 2100);
             })
             .catch((error) => {
               const msg = errorMsg(error.message, form);
