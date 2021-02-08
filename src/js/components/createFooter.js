@@ -17,7 +17,7 @@ const createFooter = (parentElement) => {
   shareContainer.insertAdjacentHTML('beforeend', yandexShare);
   const obj = `
   <object type="image/svg+xml" data="../src/assets/image/git.svg" width="70" height="70">
-    <img src="../src/assets/image/git.svg" width="200" height="200" alt="image format png" />
+    <img src="../src/assets/image/git.png" width="200" height="200" alt="image format png" />
   </object>
 `;
   svgContainer.insertAdjacentHTML('beforeend', obj);

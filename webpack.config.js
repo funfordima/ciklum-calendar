@@ -28,7 +28,7 @@ const optimization = () => {
   return config;
 };
 
-const filename = (ext) => isDev ? `[name].${ext}` : `[name].[hash].${ext}`;
+const filename = (ext) => isDev ? `[name].${ext}` : `[name].[fullhash].${ext}`;
 
 const cssLoaders = (extra) => {
   const loaders = [
@@ -66,7 +66,7 @@ const jsLoaders = () => {
 module.exports = {
   context: path.resolve(__dirname, 'src'),
   mode: 'development',
-  entry: path.resolve(__dirname, './src/index.js'),
+  entry: ['babel-polyfill', path.resolve(__dirname, './src/index.js')],
   output: {
     filename: filename('js'),
     path: path.resolve(__dirname, 'dist')

@@ -673,11 +673,20 @@ html {
     justify-content: space-between;
   }
 
+  & svg {
+    pointer-events: none;
+  }
+
   & object {
     width: 7rem;
     height: 7rem;
     transition: 0.3s;
+    pointer-events: none;
     cursor: pointer;
+
+    & svg {
+      pointer-events: none;
+    }
 
     @media (max-width: 601px) {
       width: 5rem;
