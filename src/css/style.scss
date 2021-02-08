@@ -21,12 +21,16 @@ html {
   margin: 0 auto;
   padding: 0 3rem;
   width: 100%;
-  max-width: 1200px;
+  max-width: 120rem;
   height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   background-color: #fafafa;
+
+  @media (max-width: 530px) {
+    padding: 0 2rem;
+  }
 }
 
 .header {
@@ -36,8 +40,13 @@ html {
   align-items: center;
   justify-content: space-between;
 
+  @media (max-width: 601px) {
+    flex-direction: column;
+  }
+
   &__title {
     width: 10rem;
+    font-size: 2.5rem;
 
     &_link {
       color: #d8093a;
@@ -62,6 +71,18 @@ html {
       display: flex;
       align-items: center;
       justify-content: space-between;
+
+      @media (max-width: 1000px) {
+        width: 60%;
+      }
+
+      @media (max-width: 767px) {
+        width: 70%;
+      }
+
+      @media (max-width: 601px) {
+        width: 80%;
+      }
     }
   }
 }
@@ -70,11 +91,11 @@ html {
   &-add,
   &-reset {
     display: flex;
-    width: 230px;
-    padding: 8px 16px;
+    width: 23rem;
+    padding: 0.8rem 1.6rem;
     margin: 0 auto;
     border: solid 1px #c7ccd1;
-    border-radius: 5px;
+    border-radius: 0.5rem;
     transition: all 0.2s ease-out;
     cursor: pointer;
     font-weight: bold;
@@ -84,6 +105,11 @@ html {
     &:hover {
       background-color: #d32f2f;
       color: #ffffff;
+    }
+
+    @media (max-width: 767px) {
+      padding: 0.5rem 1rem;
+      width: 18rem;
     }
   }
 
@@ -104,9 +130,14 @@ html {
 
 .menu {
   position: relative;
-  width: 230px;
-  height: 40px;
+  width: 23rem;
+  height: 4rem;
   margin: 0 auto;
+
+  @media (max-width: 767px) {
+    width: 18rem;
+    height: 3rem;
+  }
 
   &[data-state='active'] {
     .menu__title {
@@ -124,7 +155,7 @@ html {
     }
 
     .menu__input + .menu__label {
-      max-height: 40px;
+      max-height: 4rem;
       border-top-width: 1px;
     }
   }
@@ -134,8 +165,8 @@ html {
     align-items: center;
     width: 100%;
     height: 100%;
-    padding: 8px 16px;
-    border-radius: 5px;
+    padding: 0.8rem 1.6rem;
+    border-radius: 0.5rem;
     border: solid 1px #c7ccd1;
     cursor: pointer;
 
@@ -144,10 +175,10 @@ html {
       content: '';
       position: absolute;
       top: 50%;
-      right: 16px;
+      right: 1.6rem;
       display: block;
-      width: 10px;
-      height: 2px;
+      width: 1rem;
+      height: 0.2rem;
       transition: all 0.3s ease-out;
       background-color: #333333;
       transform: translate(-3px, -50%) rotate(45deg);
@@ -169,19 +200,23 @@ html {
 
   &__content {
     position: absolute;
-    top: 40px;
-    left: 3px;
+    top: 4rem;
+    left: 0.3rem;
     display: flex;
     flex-direction: column;
     width: calc(100% - 6px);
     background-color: #ffffff;
     border: 1px solid #c7ccd1;
     border-top: none;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
     transition: all 0.3s ease-out;
     opacity: 0;
     z-index: 8;
+
+    @media (max-width: 767px) {
+      top: 3rem;
+    }
   }
 
   &__input {
@@ -201,14 +236,18 @@ html {
     display: flex;
     align-items: center;
     width: 100%;
-    height: 40px;
+    height: 4rem;
     max-height: 0;
-    padding: 0 16px;
+    padding: 0 1.6rem;
     background-color: #fff;
     transition: all 0.2s ease-out;
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    @media (max-width: 601px) {
+      height: 3rem;
+    }
 
     & + input + & {
       border-top: 0 solid #c7ccd1;
@@ -223,11 +262,15 @@ html {
 
 .main {
   width: 100%;
-  height: 500px; ////
+  height: 50rem; ////
   display: flex;
   flex-wrap: wrap;
   background-color: #c8c8c8;
   border: 1px solid #eee;
+
+  @media (max-width: 601px) {
+    height: 40rem;
+  }
 
   &__item {
     display: flex;
@@ -236,13 +279,27 @@ html {
     font-size: 2rem;
     font-weight: 500;
     background-color: #fff;
-    overflow: hidden;
-    text-overflow: ellipsis;
     position: relative;
+
+    @media (max-width: 601px) {
+      font-size: 1.5rem;
+    }
 
     &_title {
       display: none;
       font-size: 2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      @media (max-width: 1000px) {
+        font-size: 1.5rem;
+      }
+
+      @media (max-width: 601px) {
+        font-size: 1.2rem;
+        text-align: center;
+      }
     }
 
     &_btn-close {
@@ -281,6 +338,14 @@ html {
   background-color: #c7c7c7;
   border: 2px solid #c7c7c7;
 
+  @media (max-width: 601px) {
+    height: 5rem;
+  }
+
+  @media (max-width: 530px) {
+    height: 4rem;
+  }
+
   & .main__item {
     background-color: #e5e5e5;
   }
@@ -297,6 +362,14 @@ html {
   background-color: #e5e5e5;
   border: 2px solid #c7c7c7;
   border-right: 0;
+
+  @media (max-width: 601px) {
+    height: calc(100% - 5rem);
+  }
+
+  @media (max-width: 530px) {
+    height: calc(100% - 4rem);
+  }
 }
 
 .content-container {
@@ -309,7 +382,17 @@ html {
   column-gap: 2px;
   background-color: #e5e5e5;
   border: 2px solid #c7c7c7;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
+
+  @media (max-width: 601px) {
+    height: calc(100% - 5rem);
+  }
+
+  @media (max-width: 530px) {
+    height: calc(100% - 4rem);
+  }
 }
 
 .overlay {
@@ -328,8 +411,8 @@ html {
 .modal {
   padding: 2rem;
   margin: auto;
-  width: 500px;
-  height: 500px;
+  width: 50rem;
+  height: 50rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -343,9 +426,14 @@ html {
   z-index: 13;
   transition: all 3s ease;
 
+  @media (max-width: 601px) {
+    width: 45rem;
+    height: 45rem;
+  }
+
   &.msg {
     margin: 0 auto;
-    width: 300px;
+    width: 30rem;
     height: fit-content;
     top: 5%;
     flex-direction: column;
@@ -377,8 +465,8 @@ html {
     &__input {
       margin: 0 auto;
       padding-left: 1rem;
-      width: 230px;
-      height: 40px;
+      width: 23rem;
+      height: 4rem;
       border-radius: 0.5rem;
       border: 1px solid #c7ccd1;
       position: relative;
@@ -396,12 +484,12 @@ html {
       text-transform: uppercase;
       font-size: 0.75em;
       letter-spacing: 1px;
-      height: 38px;
-      width: 120px;
-      line-height: 38px;
+      height: 3.8rem;
+      width: 12rem;
+      line-height: 3.8rem;
       overflow: hidden;
       border-radius: 3px;
-      box-shadow: 0 15px 30px rgba(black, 0.1);
+      box-shadow: 0 1.5rem 3rem rgba(black, 0.1);
       border: 0;
       cursor: pointer;
       outline: none;
@@ -409,7 +497,7 @@ html {
 
       &:hover,
       &:focus {
-        box-shadow: 0 5px 15px rgba(black, 0.1);
+        box-shadow: 0 0.5rem 1.5rem rgba(black, 0.1);
       }
     }
   }
@@ -418,8 +506,8 @@ html {
     width: 4rem;
     height: 4rem;
     position: absolute;
-    top: -20px;
-    right: -20px;
+    top: -2rem;
+    right: -2rem;
     border-radius: 50%;
     border: 1px solid #979797;
     background: transparent;
@@ -430,7 +518,7 @@ html {
     &:hover,
     &:focus {
       color: #d8093a;
-      box-shadow: 0 5px 15px rgba(black, 0.1);
+      box-shadow: 0 0.5rem 1.5rem rgba(black, 0.1);
     }
   }
 }
@@ -473,13 +561,13 @@ html {
 
   &.state-1 {
     .pre-state-msg {
-      margin-top: -38px;
+      margin-top: -3.8rem;
     }
   }
 
   &.state-2 {
     .pre-state-msg {
-      margin-top: -76px;
+      margin-top: -7.6rem;
     }
   }
 }
@@ -489,11 +577,11 @@ html {
 }
 
 .error-msg {
-  margin-top: 20px;
-  padding: 8px 16px 8px 48px;
+  margin-top: 2rem;
+  padding: 0.8rem 1.6rem 0.8rem 4.8rem;
   position: relative;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 1.6rem;
+  line-height: 2.4rem;
   color: #fe5652;
   text-align: left;
   border-radius: 2px;
@@ -504,23 +592,23 @@ html {
   &:after {
     content: '';
     position: absolute;
-    left: 12px;
-    top: 8px;
-    width: 24px;
-    height: 24px;
+    left: 1.2rem;
+    top: 0.8rem;
+    width: 2.4rem;
+    height: 2.4rem;
     background-image: url('../assets/image/error.svg');
-    background-size: 24px 24px;
+    background-size: 2.4rem 2.4rem;
     background-repeat: no-repeat;
     background-position: center center;
   }
 }
 
 .success-msg {
-  margin-top: 20px;
-  padding: 8px 16px 8px 48px;
+  margin-top: 2rem;
+  padding: 0.8rem 1.6rem 0.8rem 4.8rem;
   position: relative;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 1.6rem;
+  line-height: 2.4rem;
   color: #64dd17;
   text-align: left;
   border-radius: 2px;
@@ -531,19 +619,19 @@ html {
   &:after {
     content: '';
     position: absolute;
-    left: 12px;
-    top: 8px;
-    width: 24px;
-    height: 24px;
+    left: 1.2rem;
+    top: 0.8rem;
+    width: 2.4rem;
+    height: 2.4rem;
     background-image: url('../assets/image/success.svg');
-    background-size: 24px 24px;
+    background-size: 2.4rem 2.4rem;
     background-repeat: no-repeat;
     background-position: center center;
   }
 }
 
 .footer {
-  height: 77px;
+  height: 7.7rem;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -581,12 +669,16 @@ html {
     justify-content: space-between;
   }
 
-  & svg {
-    width: 2rem;
-    height: 2rem;
-    margin-left: 1rem;
+  & object {
+    width: 7rem;
+    height: 7rem;
     transition: 0.3s;
     cursor: pointer;
+
+    @media (max-width: 601px) {
+      width: 5rem;
+      height: 5rem;
+    }
 
     & path {
       fill: #fff;
