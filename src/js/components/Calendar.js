@@ -209,5 +209,8 @@ export default class Calendar {
         this.todos = eventsList;
       });
     });
+
+    document.querySelector('.author:nth-of-type(2)').addEventListener('click',
+      () => new Audio('../src/assets/meow.mp3').play());
   }
 }
