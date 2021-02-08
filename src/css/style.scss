@@ -521,6 +521,10 @@ html {
       box-shadow: 0 0.5rem 1.5rem rgba(black, 0.1);
     }
   }
+
+  &__text {
+    text-align: center;
+  }
 }
 
 @keyframes short-press {

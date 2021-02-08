@@ -4,7 +4,7 @@ import Data from '../utils/data';
 import { URL_EVENTS } from '../constants/constants';
 import { successMsg, errorMsg } from './statusMsg';
 
-const createNewItem = (main, members, days, times, renderMainFunc) => {
+const createNewItem = (main, members, days, times, renderMainFunc, isReplace = false) => {
   const overlay = create('div', 'overlay', null, main);
   const modal = create('div', 'modal', null, overlay);
   const form = create('form', 'modal-form', null, modal, ['name', 'modal-form']);
@@ -131,19 +131,28 @@ const createNewItem = (main, members, days, times, renderMainFunc) => {
         };
 
         const events = JSON.parse(localStorage.getItem('events'));
+
         const newEvents = events.map((eventItem) => {
           const { day, time, title } = eventItem;
           const condition = newDay === day && newTime === time;
 
           if (condition && inputEvent === title) {
-            const msg = errorMsg(message.failure, form);
-            isLoad = false;
+            if (!isReplace) {
+              const msg = errorMsg(message.failure, form);
+              isLoad = false;
 
-            setTimeout(() => form.removeChild(msg), 2000);
+              setTimeout(() => form.removeChild(msg), 2000);
+            } else {
+              isLoad = true;
+
+              return newEvent;
+            }
           } else if (condition && inputEvent !== title) {
             isLoad = true;
+
             return newEvent;
           }
+
           return eventItem;
         });
 

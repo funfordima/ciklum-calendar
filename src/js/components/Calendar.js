@@ -168,7 +168,19 @@ export default class Calendar {
     // Handle Delete Event
     this.contentContainer.addEventListener('click', ({ target }) => {
       if (target.classList.contains('main__item_btn-close')) {
-        createModalDialog(this.root, 'Вы уверены, что хотите удалить этот ивент?', this.handlerDeleteEvent.bind(this, target.parentElement));
+        const eventTitle = target.previousElementSibling.textContent;
+        createModalDialog(this.root, `Вы уверены, что хотите удалить ивент ${eventTitle}?`, this.handlerDeleteEvent.bind(this, target.parentElement));
+      }
+    });
+
+    // Handle Change Event
+    this.contentContainer.addEventListener('dblclick', ({ target }) => {
+      if (target.classList.contains('main__item') || target.classList.contains('main__item_title')) {
+        createNewItem(document.body, this.members, this.days, this.timeLabels, () => {
+          const eventsList = JSON.parse(localStorage.getItem('events'));
+          this.generateToDoItems(eventsList);
+          this.todos = eventsList;
+        }, true);
       }
     });
 
@@ -192,6 +204,7 @@ export default class Calendar {
       this.generateToDoItems(this.todos);
     });
 
+    // Handle add event
     this.btnAddItem.addEventListener('click', (e) => {
       e.preventDefault();
       createNewItem(document.body, this.members, this.days, this.timeLabels, () => {
