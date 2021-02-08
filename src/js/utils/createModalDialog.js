@@ -6,8 +6,10 @@ const createModalDialog = (parentElement, msg, callback) => {
   const textContainer = create('div', 'modal-form_line', null, modal);
   const buttonContainer = create('div', 'modal-form_line', null, modal);
   create('h3', 'modal__text', msg, textContainer, ['tab-index', '1']);
-  create('input', 'modal-form__btn submit-button state-0', null, buttonContainer, ['type', 'button'], ['value', 'Confirm'], ['name', 'modal-submit'], ['tab-index', '2']);
-  create('input', 'modal-form__btn cancel-button', null, buttonContainer, ['type', 'button'], ['value', 'Cancel'], ['name', 'modal-cancel'], ['tab-index', '3']);
+  create('input', 'modal-form__btn submit-button state-0', null, buttonContainer,
+    ['type', 'button'], ['value', 'Confirm'], ['name', 'modal-submit'], ['tab-index', '2']);
+  create('input', 'modal-form__btn cancel-button', null, buttonContainer,
+    ['type', 'button'], ['value', 'Cancel'], ['name', 'modal-cancel'], ['tab-index', '3']);
 
   overlay.addEventListener('click', ({ target }) => {
     if (target.classList.contains('submit-button')) {
