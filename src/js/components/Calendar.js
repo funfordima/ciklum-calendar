@@ -96,7 +96,6 @@ export default class Calendar {
 
     function dragLeave() {
       this.className = 'main__item';
-      isDragging = null;
     }
 
     function dragDrop() {
