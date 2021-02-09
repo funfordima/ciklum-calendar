@@ -1,7 +1,7 @@
 import create from '../utils/create';
 import createItemMember from '../utils/createItemMember';
 import Data from '../utils/data';
-import { URL_EVENTS } from '../constants/constants';
+import { URL_EVENTS, message } from '../constants/constants';
 import { successMsg, errorMsg } from './statusMsg';
 
 const createNewItem = (main, members, days, times, renderMainFunc, isReplace = false) => {
@@ -73,15 +73,6 @@ const createNewItem = (main, members, days, times, renderMainFunc, isReplace = f
     btnSubmit.classList.add('state-1', 'animated');
 
     setTimeout(finalButtonMsg, 2000);
-  };
-
-  const message = {
-    success: 'Готово!',
-    failure: 'Слот занят. Выберите другое время или дату.',
-    noEvent: 'Имя ивента некорректное',
-    noMember: 'Выберите, пожалуйста, участника(ов)',
-    noDay: 'Выберите, пожалуйста, день ивента',
-    noTime: 'Выберите, пожалуйста, время ивента',
   };
 
   form.addEventListener('submit', (e) => {

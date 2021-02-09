@@ -1,7 +1,7 @@
 import create from '../utils/create';
 import createNewItem from './createNewItem';
 import createItemMember from '../utils/createItemMember';
-import { URL_EVENTS, URL_MEMBERS } from '../constants/constants';
+import { URL_EVENTS, URL_MEMBERS, message } from '../constants/constants';
 import Data from '../utils/data';
 import { successMsg, errorMsg } from './statusMsg';
 import createModalDialog from '../utils/createModalDialog';
@@ -59,18 +59,134 @@ export default class Calendar {
       time,
       participants,
     }) => {
-      const todoContainer = create('div', 'main__item', null, this.contentContainer,
-        ['data-complete', complete], ['data-day', day], ['data-time', time], ['title', participants.join(' ')]);
+      const todoWrapper = create('div', 'wrap', null, this.contentContainer);
+      const todoContainer = create('div', 'main__item', null, todoWrapper,
+        ['data-complete', complete], ['data-day', day], ['data-time', time], ['title', participants.join(' ')],
+        ['draggable', complete]);
       create('h3', 'main__item_title', title, todoContainer);
       create('div', 'main__item_btn-close', '&times;', todoContainer);
     });
+
+    let isDragging = null;
+    const fillElements = this.contentContainer.querySelectorAll('div[draggable="true"]');
+    const emptiesElements = this.contentContainer.querySelectorAll('div[draggable="false"]');
+    const rerenderMain = this.generateToDoItems.bind(this);
+
+    function dragStart() {
+      isDragging = this;
+      this.className += ' hold';
+
+      setTimeout(() => {
+        this.className = 'invisible';
+      }, 0);
+    }
+
+    function dragEnd() {
+      this.className = 'main__item';
+    }
+
+    function dragOver(e) {
+      e.preventDefault();
+    }
+
+    function dragEnter(e) {
+      e.preventDefault();
+      this.className += ' hovered';
+    }
+
+    function dragLeave() {
+      this.className = 'main__item';
+      isDragging = null;
+    }
+
+    function dragDrop() {
+      this.className = 'main__item';
+
+      if (isDragging) {
+        const dragStartDay = isDragging.dataset.day;
+        const dragStartTime = isDragging.dataset.time;
+
+        const dragEndDay = this.dataset.day;
+        const dragEndTime = this.dataset.time;
+        const dragParticipants = isDragging.title.split(' ');
+        const dragTitle = isDragging.firstChild.textContent;
+        const newEvent = {
+          title: dragTitle,
+          participants: [...dragParticipants],
+          day: dragEndDay,
+          time: dragEndTime,
+          complete: true,
+        };
+
+        const events = JSON.parse(localStorage.getItem('events'));
+
+        const newEvents = events.map((eventItem) => {
+          const { day, time } = eventItem;
+
+          if (dragStartDay === day && dragStartTime === time) {
+            return ({
+              title: '',
+              participants: [''],
+              day: dragStartDay,
+              time: dragStartTime,
+              complete: false,
+            });
+          }
+          if (dragEndDay === day && dragEndTime === time) {
+            return newEvent;
+          }
+
+          return eventItem;
+        });
+
+        const todoContainer = create('div', 'main__item draggable', null, null,
+          ['data-complete', false], ['data-day', dragStartDay], ['data-time', dragStartTime], ['title', ['']],
+          ['draggable', false]);
+        create('h3', 'main__item_title', '', todoContainer);
+        create('div', 'main__item_btn-close', '&times;', todoContainer);
+
+        document.querySelector('.invisible').replaceWith(todoContainer);
+
+        Data.sendData(URL_EVENTS, newEvents)
+          .then(() => {
+            const main = document.querySelector('.main');
+            localStorage.setItem('events', JSON.stringify(newEvents));
+            const msg = successMsg(message.success, main);
+
+            rerenderMain(newEvents);
+
+            setTimeout(() => {
+              main.removeChild(msg);
+            }, 2100);
+          })
+          .catch((error) => {
+            const main = document.querySelector('.main');
+            const msg = errorMsg(error.message, main);
+
+            setTimeout(() => main.removeChild(msg), 2000);
+          });
+      }
+
+      this.replaceWith(isDragging);
+      isDragging = null;
+    }
+
+    emptiesElements.forEach((empty) => {
+      empty.addEventListener('dragover', dragOver);
+      empty.addEventListener('dragenter', dragEnter);
+      empty.addEventListener('dragleave', dragLeave);
+      empty.addEventListener('drop', dragDrop);
+    });
+
+    fillElements.forEach((fillEl) => fillEl.addEventListener('dragstart', dragStart));
+    fillElements.forEach((fillEl) => fillEl.addEventListener('dragend', dragEnd));
   }
 
   createMain() {
-    const main = create('main', 'main', null, this.root);
-    const rowContainer = create('div', 'row-container', null, main);
-    const columnContainer = create('div', 'col-container', null, main);
-    this.contentContainer = create('div', 'content-container', null, main);
+    this.main = create('main', 'main', null, this.root);
+    const rowContainer = create('div', 'row-container', null, this.main);
+    const columnContainer = create('div', 'col-container', null, this.main);
+    this.contentContainer = create('div', 'content-container', null, this.main);
 
     this.days.forEach((dayItem) => {
       create('div', 'main__item', dayItem, rowContainer);
