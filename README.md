@@ -51,3 +51,8 @@ Technologies stack:
 - [x] The meeting can be successfully created if and only if the time slot for that day and time is free. Otherwise the error bar should be shown.
 - [x] After successful creation of an event, the user should be transferred back to the “Calendar” screen where new event should already be displayed.
 - [x] In order to delete a meeting user has to click the delete icon near the meeting title at “Calendar” screen and then confirm his action in a confirmation dialog.
+- [x] the minimum page width at which the app is checked for correct display and operation is 500px.
+
+## Hacker scope
+- [x] Implement possibility to change meeting day/time using drag and drop technique on “Calendar” view.
+- [x] the data is saved in database (ex: firebase) 
