@@ -1,7 +1,7 @@
 import create from '../utils/create';
 import createNewItem from './createNewItem';
 import createItemMember from '../utils/createItemMember';
-import { URL_EVENTS, URL_MEMBERS } from '../constants/constants';
+import { URL_EVENTS, URL_MEMBERS, message } from '../constants/constants';
 import Data from '../utils/data';
 import { successMsg, errorMsg } from './statusMsg';
 import createModalDialog from '../utils/createModalDialog';
@@ -59,18 +59,20 @@ export default class Calendar {
       time,
       participants,
     }) => {
-      const todoContainer = create('div', 'main__item', null, this.contentContainer,
-        ['data-complete', complete], ['data-day', day], ['data-time', time], ['title', participants.join(' ')]);
+      const todoWrapper = create('div', 'wrap', null, this.contentContainer);
+      const todoContainer = create('div', 'main__item draggable', null, todoWrapper,
+        ['data-complete', complete], ['data-day', day], ['data-time', time], ['title', participants.join(' ')],
+        ['draggable', complete ? true : false]);
       create('h3', 'main__item_title', title, todoContainer);
       create('div', 'main__item_btn-close', '&times;', todoContainer);
     });
   }
 
   createMain() {
-    const main = create('main', 'main', null, this.root);
-    const rowContainer = create('div', 'row-container', null, main);
-    const columnContainer = create('div', 'col-container', null, main);
-    this.contentContainer = create('div', 'content-container', null, main);
+    this.main = create('main', 'main', null, this.root);
+    const rowContainer = create('div', 'row-container', null, this.main);
+    const columnContainer = create('div', 'col-container', null, this.main);
+    this.contentContainer = create('div', 'content-container', null, this.main);
 
     this.days.forEach((dayItem) => {
       create('div', 'main__item', dayItem, rowContainer);
@@ -212,5 +214,245 @@ export default class Calendar {
 
     document.querySelector('.author:nth-of-type(2)').addEventListener('click',
       () => new Audio('../src/assets/meow.mp3').play());
+
+    // Handle drag n drop
+    let isDragging = null;
+    const fillElements = this.contentContainer.querySelectorAll('div[draggable="true"]');
+    const emptiesElements = this.contentContainer.querySelectorAll('div[draggable="false"]');
+
+    function dragStart() {
+      isDragging = this;
+      this.className += ' hold';
+
+      console.log(isDragging);
+
+      setTimeout(() => (this.className = 'invisible'), 0);
+    }
+
+    function dragEnd() {
+      this.className = 'main__item';
+    }
+
+    function dragOver(e) {
+      e.preventDefault();
+    }
+
+    function dragEnter(e) {
+      e.preventDefault();
+      this.className += ' hovered';
+    }
+
+    function dragLeave() {
+      this.className = 'main__item';
+      isDragging = null;
+    }
+
+    function dragDrop() {
+      this.className = 'main__item';
+
+      console.log(this);
+
+      if (isDragging) {
+        const dragStartDay = isDragging.dataset.day;
+        const dragStartTime = isDragging.dataset.time;
+        const dragParticipants = isDragging.title.split(' ');
+        const dragTitle = isDragging.firstChild.textContent;
+        const newEvent = {
+          title: dragTitle,
+          participants: [...dragParticipants],
+          day: dragStartDay,
+          time: dragStartTime,
+          complete: true,
+        };
+
+        // const events = JSON.parse(localStorage.getItem('events'));
+
+        // const newEvents = events.map((eventItem) => {
+        //   const { day, time, title } = eventItem;
+        //   const condition = dragDay === day && dragTime === time;
+
+        //   if (condition && dragTitle !== title) {
+        //     // isLoad = true;
+        //     return newEvent;
+        //   }
+
+        //   return eventItem;
+        // });
+
+        const todoContainer = create('div', 'main__item draggable', null, null,
+          ['data-complete', false], ['data-day', dragStartDay], ['data-time', dragStartTime], ['title', ['']],
+          ['draggable', false]);
+        create('h3', 'main__item_title', '', todoContainer);
+        create('div', 'main__item_btn-close', '&times;', todoContainer);
+
+        document.querySelector('.invisible').replaceWith(todoContainer);
+
+        console.log('sending data');
+
+        // Data.sendData(URL_EVENTS, newEvents)
+        //   .then(() => {
+        //     localStorage.setItem('events', JSON.stringify(newEvents));
+        //     const msg = successMsg(message.success, this.main);
+        //     // renderMainFunc();
+        //     console.log('data done');
+
+        //     setTimeout(() => {
+        //       this.main.removeChild(msg);
+        //     }, 2100);
+        //   })
+        //   .catch((error) => {
+        //     const msg = errorMsg(error.message, this.main);
+
+        //     setTimeout(() => this.main.removeChild(msg), 2000);
+        //   });
+      }
+
+      this.replaceWith(isDragging);
+      isDragging = null;
+    }
+
+    for (const empty of emptiesElements) {
+      empty.addEventListener('dragover', dragOver);
+      empty.addEventListener('dragenter', dragEnter);
+      empty.addEventListener('dragleave', dragLeave);
+      empty.addEventListener('drop', dragDrop);
+    }
+
+    fillElements.forEach((fillEl) => fillEl.addEventListener('dragstart', dragStart));
+    fillElements.forEach((fillEl) => fillEl.addEventListener('dragend', dragEnd));
+
+    // let isDragging = false;
+
+    // document.addEventListener('mousedown', (event) => {
+
+    //   let dragElement = event.target.closest('.draggable');
+    //   console.log(dragElement);
+
+    //   if (!dragElement) {
+    //     return;
+    //   }
+
+    //   event.preventDefault();
+
+    //   dragElement.ondragstart = () => {
+    //     return false;
+    //   };
+
+    //   let shiftX;
+    //   let shiftY;
+
+    //   startDrag(dragElement, event.clientX, event.clientY);
+
+    //   function onMouseUp(event) {
+    //     finishDrag();
+    //   }
+
+    //   function onMouseMove(event) {
+    //     moveAt(event.clientX, event.clientY);
+    //   }
+
+    //   // в начале перемещения элемента:
+    //   //   запоминаем место клика по элементу (shiftX, shiftY),
+    //   //   переключаем позиционирование элемента (position:fixed) и двигаем элемент
+    //   function startDrag(element, clientX, clientY) {
+    //     if (isDragging) {
+    //       return;
+    //     }
+
+    //     isDragging = true;
+
+    //     document.addEventListener('mousemove', onMouseMove);
+    //     element.addEventListener('mouseup', onMouseUp);
+
+    //     shiftX = clientX - element.getBoundingClientRect().left;
+    //     shiftY = clientY - element.getBoundingClientRect().top;
+    //     const width = element.offsetWidth;
+    //     const height = element.offsetHeight;
+
+    //     console.log(element, width, height);
+
+    //     element.style.width = `${width}px`;
+    //     element.style.height = `${height}px`;
+    //     element.style.position = 'fixed';
+
+    //     moveAt(clientX, clientY);
+    //   }
+
+    //   // переключаемся обратно на абсолютные координаты
+    //   // чтобы закрепить элемент относительно документа
+    //   function finishDrag() {
+    //     if (!isDragging) {
+    //       return;
+    //     }
+
+    //     isDragging = false;
+
+    //     dragElement.style.top = parseInt(dragElement.style.top) + window.pageYOffset + 'px';
+    //     dragElement.style.position = 'absolute';
+
+    //     document.removeEventListener('mousemove', onMouseMove);
+    //     dragElement.removeEventListener('mouseup', onMouseUp);
+    //   }
+
+    //   function moveAt(clientX, clientY) {
+    //     // вычисляем новые координаты (относительно окна)
+    //     let newX = clientX - shiftX;
+    //     let newY = clientY - shiftY;
+
+    //     // проверяем, не переходят ли новые координаты за нижний край окна:
+    //     // сначала вычисляем гипотетический новый нижний край окна
+    //     let newBottom = newY + dragElement.offsetHeight;
+
+    //     // затем, если новый край окна выходит за пределы документа, прокручиваем страницу
+    //     if (newBottom > document.documentElement.clientHeight) {
+    //       // координата нижнего края документа относительно окна
+    //       let docBottom = document.documentElement.getBoundingClientRect().bottom;
+
+    //       // простой скролл документа на 10px вниз имеет проблему -
+    //       // он может прокручивать документ за его пределы,
+    //       // поэтому используем Math.min(расстояние до конца, 10)
+    //       let scrollY = Math.min(docBottom - newBottom, 10);
+
+    //       // вычисления могут быть не совсем точны - случаются ошибки при округлении,
+    //       // которые приводят к отрицательному значению прокрутки. отфильтруем их:
+    //       if (scrollY < 0) {
+    //         scrollY = 0;
+    //       }
+
+    //       window.scrollBy(0, scrollY);
+
+    //       // быстрое перемещение мыши может поместить курсор за пределы документа вниз
+    //       // если это произошло -
+    //       // ограничиваем новое значение Y максимально возможным исходя из размера документа:
+    //       newY = Math.min(newY, document.documentElement.clientHeight - dragElement.offsetHeight);
+    //     }
+
+    //     // проверяем, не переходят ли новые координаты за верхний край окна (по схожему алгоритму)
+    //     if (newY < 0) {
+    //       // прокручиваем окно вверх
+    //       let scrollY = Math.min(-newY, 10);
+    //       if (scrollY < 0) {
+    //         scrollY = 0; // проверяем ошибки точности
+    //       }
+
+    //       window.scrollBy(0, -scrollY);
+    //       // быстрое перемещение мыши может поместить курсор за пределы документа вверх
+    //       newY = Math.max(newY, 0); // newY не может быть меньше нуля
+    //     }
+
+    //     // ограничим newX размерами окна
+    //     // согласно условию, горизонтальная прокрутка отсутствует, поэтому это не сложно:
+    //     if (newX < 0) {
+    //       newX = 0;
+    //     }
+    //     if (newX > document.documentElement.clientWidth - dragElement.offsetWidth) {
+    //       newX = document.documentElement.clientWidth - dragElement.offsetWidth;
+    //     }
+
+    //     dragElement.style.left = newX + 'px';
+    //     dragElement.style.top = newY + 'px';
+    //   }
+    // });
+    /////////////////
   }
 }
