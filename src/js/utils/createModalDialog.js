@@ -15,7 +15,8 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
   if (child) {
     textContainer.insertAdjacentElement('beforeend', child);
 
-    textContainer.querySelector('.modal-form__input').focus();
+    const inputUser = textContainer.querySelector('.modal-form__input');
+    inputUser && inputUser.focus();
 
     textContainer.querySelector('.modal-form').addEventListener('submit', (event) => {
       event.preventDefault();
@@ -34,7 +35,8 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
     }
   });
 
-  textContainer.querySelector('.modal-form__input').addEventListener('blur', ({ target }) => {
+  const inputUser = textContainer.querySelector('.modal-form__input');
+  inputUser && inputUser.addEventListener('blur', ({ target }) => {
     const newName = target.value;
     const minNameLength = 2;
 
@@ -48,7 +50,7 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
     }
   });
 
-  textContainer.querySelector('.modal-form__input').addEventListener('change', ({ target }) => {
+  inputUser && inputUser.addEventListener('change', ({ target }) => {
     const members = JSON.parse(localStorage.getItem('members'));
     const condition = members.find(({ name }) => name === target.value);
 

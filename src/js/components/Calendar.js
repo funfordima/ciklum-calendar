@@ -38,11 +38,6 @@ export default class Calendar {
     create('a', 'header__title_link', 'Calendar', headerTitle, ['href', '#'], ['alt', 'logo link']);
   }
 
-  async createMembers(parentElement) {
-    parentElement.innerHTML = '';
-    this.generateMembers(parentElement);
-  }
-
   async generateMembers(parentElement) {
     this.members = await Data.getData(URL_MEMBERS);
     this.members = this.members[Object.keys(this.members)[Object.keys(this.members).length - 1]];
@@ -53,6 +48,11 @@ export default class Calendar {
       .forEach((el, indx) => el.setAttribute('id', `${this.members[indx]}_header`));
     document.querySelectorAll('.menu__content label')
       .forEach((el, indx) => el.setAttribute('for', `${this.members[indx]}_header`));
+  }
+
+  async createMembers(parentElement) {
+    parentElement.innerHTML = '';
+    this.generateMembers(parentElement);
   }
 
   /* eslint no-param-reassign: ["error", { "props": false }] */
@@ -303,17 +303,40 @@ export default class Calendar {
     localStorage.setItem('events', JSON.stringify(this.todos));
 
     this.createHeader();
-    this.generateMembers(this.membersContainer);
+    await this.generateMembers(this.membersContainer);
     this.createMain();
     createFooter(this.root);
     this.handlerInputMembers();
 
-    // const ivan = new User('Ivan');
-    // 
-    // // members.push(new User('Nick'));
-    // console.log(members.filter(item => item != null));
-    // members.push(new Admin('Tamara'));
+    // Choose user  
+    const form = create('form', 'modal-form', null, null, ['name', 'modal-form']);
+    const memberContainer = create('div', 'modal-form_line', null, form);
+    // Members input
+    const menuMember = create('div', 'menu', null, memberContainer, ['data-state', ''], ['tabindex', '2']);
+    const menuContentMember = create('div', 'menu__content', null, menuMember);
+    const menuTitleMember = create('div', 'menu__title', null, menuMember, ['data-default', '']);
+    menuTitleMember.setAttribute('tabindex', '0');
 
+    createItemMember(this.members, menuContentMember);
+
+    createModalDialog(this.root, `Please authorise`, (name) => console.log('choose', name), form);
+
+    menuMember.addEventListener('click', ({ target }) => {
+      if (target.classList.contains('menu__title')) {
+        // Toggle menu
+        if (menuMember.getAttribute('data-state') === 'active') {
+          menuMember.setAttribute('data-state', '');
+        } else {
+          menuMember.setAttribute('data-state', 'active');
+        }
+      }
+
+      if (target.classList.contains('menu__label')) {
+        // Close when click to input option
+        menuTitleMember.textContent = target.textContent;
+        menuMember.setAttribute('data-state', '');
+      }
+    });
   }
 
   async render() {
