@@ -106,6 +106,10 @@ html {
     color: #ffffff;
   }
 
+  &.hide {
+    display: none;
+  }
+
   @media (max-width: 767px) {
     padding: 0.5rem 1rem;
     width: 18rem;

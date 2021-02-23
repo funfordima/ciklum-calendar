@@ -151,6 +151,10 @@ html {
   color: #ffffff;
 }
 
+.event-btn.hover {
+  display: none;
+}
+
 @media (max-width: 767px) {
   .event-btn {
     padding: 0.5rem 1rem;

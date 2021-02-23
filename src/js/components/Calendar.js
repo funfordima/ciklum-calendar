@@ -17,13 +17,14 @@ export default class Calendar {
     this.members = [];
     this.contentContainer = '';
     this.currentUser = null;
+    this.isAdmin = false;
   }
 
   createHeader() {
     const header = create('header', 'header', null, this.root);
     const headerTitle = create('h1', 'header__title', null, header);
     const navContainer = create('div', 'header__form_container', null, header);
-    this.btnAddMember = create('button', 'event-btn add-member', 'New Member +', navContainer,
+    this.btnAddMember = create('button', 'event-btn add-member hide', 'New Member +', navContainer,
       ['type', 'submit'], ['value', 'New Member +']);
     const form = create('form', 'header__form', null, navContainer, ['name', 'members-form']);
     const btnContainer = create('div', 'event-btn__container', null, form);
@@ -32,8 +33,9 @@ export default class Calendar {
 
     this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', ''], ['tabindex', 0]);
     create('div', 'menu__container', this.menu, form);
-    this.btnAddItem = create('input', 'event-btn add-event', null, btnContainer,
+    this.btnAddItem = create('input', 'event-btn add-event hide', null, btnContainer,
       ['type', 'submit'], ['value', 'New Event +']);
+
     this.resetMenuBtn = create('input', 'event-btn reset-event', null, btnContainer,
       ['type', 'reset'], ['value', 'Clear it!']);
     create('a', 'header__title_link', 'Calendar', headerTitle, ['href', '#'], ['alt', 'logo link']);
@@ -74,118 +76,121 @@ export default class Calendar {
       create('div', 'main__item_btn-close', '&times;', todoContainer, ['tabindex', '0']);
     });
 
-    let isDragging = null;
-    const fillElements = this.contentContainer.querySelectorAll('div[draggable="true"]');
-    const emptiesElements = this.contentContainer.querySelectorAll('div[draggable="false"]');
-    const rerenderMain = this.generateToDoItems.bind(this);
+    console.log(this.currentUser);
+    if (this.isAdmin) {
+      let isDragging = null;
+      const fillElements = this.contentContainer.querySelectorAll('div[draggable="true"]');
+      const emptiesElements = this.contentContainer.querySelectorAll('div[draggable="false"]');
+      const rerenderMain = this.generateToDoItems.bind(this);
 
-    function dragStart() {
-      isDragging = this;
-      this.className += ' hold';
+      function dragStart() {
+        isDragging = this;
+        this.className += ' hold';
 
-      setTimeout(() => {
-        this.className = 'invisible';
-      }, 0);
-    }
-
-    function dragEnd() {
-      this.className = 'main__item';
-    }
-
-    function dragOver(e) {
-      e.preventDefault();
-    }
-
-    function dragEnter(e) {
-      e.preventDefault();
-      this.className += ' hovered';
-    }
-
-    function dragLeave() {
-      this.className = 'main__item';
-    }
-
-    function dragDrop() {
-      this.className = 'main__item';
-
-      if (isDragging) {
-        const dragStartDay = isDragging.dataset.day;
-        const dragStartTime = isDragging.dataset.time;
-
-        const dragEndDay = this.dataset.day;
-        const dragEndTime = this.dataset.time;
-        const dragParticipants = isDragging.title.split(' ');
-        const dragTitle = isDragging.firstChild.textContent;
-        const newEvent = {
-          title: dragTitle,
-          participants: [...dragParticipants],
-          day: dragEndDay,
-          time: dragEndTime,
-          complete: true,
-        };
-
-        const events = JSON.parse(localStorage.getItem('events'));
-
-        const newEvents = events.map((eventItem) => {
-          const { day, time } = eventItem;
-
-          if (dragStartDay === day && dragStartTime === time) {
-            return ({
-              title: '',
-              participants: [''],
-              day: dragStartDay,
-              time: dragStartTime,
-              complete: false,
-            });
-          }
-          if (dragEndDay === day && dragEndTime === time) {
-            return newEvent;
-          }
-
-          return eventItem;
-        });
-
-        const todoContainer = create('div', 'main__item draggable', null, null,
-          ['data-complete', false], ['data-day', dragStartDay], ['data-time', dragStartTime], ['title', ['']],
-          ['draggable', false]);
-        create('h3', 'main__item_title', '', todoContainer);
-        create('div', 'main__item_btn-close', '&times;', todoContainer);
-
-        document.querySelector('.invisible').replaceWith(todoContainer);
-
-        Data.sendData(URL_EVENTS, newEvents)
-          .then(() => {
-            const main = document.querySelector('.main');
-            localStorage.setItem('events', JSON.stringify(newEvents));
-            const msg = successMsg(message.success, main);
-
-            rerenderMain(newEvents);
-
-            setTimeout(() => {
-              main.removeChild(msg);
-            }, 2100);
-          })
-          .catch((error) => {
-            const main = document.querySelector('.main');
-            const msg = errorMsg(error.message, main);
-
-            setTimeout(() => main.removeChild(msg), 2000);
-          });
+        setTimeout(() => {
+          this.className = 'invisible';
+        }, 0);
       }
 
-      this.replaceWith(isDragging);
-      isDragging = null;
+      function dragEnd() {
+        this.className = 'main__item';
+      }
+
+      function dragOver(e) {
+        e.preventDefault();
+      }
+
+      function dragEnter(e) {
+        e.preventDefault();
+        this.className += ' hovered';
+      }
+
+      function dragLeave() {
+        this.className = 'main__item';
+      }
+
+      function dragDrop() {
+        this.className = 'main__item';
+
+        if (isDragging) {
+          const dragStartDay = isDragging.dataset.day;
+          const dragStartTime = isDragging.dataset.time;
+
+          const dragEndDay = this.dataset.day;
+          const dragEndTime = this.dataset.time;
+          const dragParticipants = isDragging.title.split(' ');
+          const dragTitle = isDragging.firstChild.textContent;
+          const newEvent = {
+            title: dragTitle,
+            participants: [...dragParticipants],
+            day: dragEndDay,
+            time: dragEndTime,
+            complete: true,
+          };
+
+          const events = JSON.parse(localStorage.getItem('events'));
+
+          const newEvents = events.map((eventItem) => {
+            const { day, time } = eventItem;
+
+            if (dragStartDay === day && dragStartTime === time) {
+              return ({
+                title: '',
+                participants: [''],
+                day: dragStartDay,
+                time: dragStartTime,
+                complete: false,
+              });
+            }
+            if (dragEndDay === day && dragEndTime === time) {
+              return newEvent;
+            }
+
+            return eventItem;
+          });
+
+          const todoContainer = create('div', 'main__item draggable', null, null,
+            ['data-complete', false], ['data-day', dragStartDay], ['data-time', dragStartTime], ['title', ['']],
+            ['draggable', false]);
+          create('h3', 'main__item_title', '', todoContainer);
+          create('div', 'main__item_btn-close', '&times;', todoContainer);
+
+          document.querySelector('.invisible').replaceWith(todoContainer);
+
+          Data.sendData(URL_EVENTS, newEvents)
+            .then(() => {
+              const main = document.querySelector('.main');
+              localStorage.setItem('events', JSON.stringify(newEvents));
+              const msg = successMsg(message.success, main);
+
+              rerenderMain(newEvents);
+
+              setTimeout(() => {
+                main.removeChild(msg);
+              }, 2100);
+            })
+            .catch((error) => {
+              const main = document.querySelector('.main');
+              const msg = errorMsg(error.message, main);
+
+              setTimeout(() => main.removeChild(msg), 2000);
+            });
+        }
+
+        this.replaceWith(isDragging);
+        isDragging = null;
+      }
+
+      emptiesElements.forEach((empty) => {
+        empty.addEventListener('dragover', dragOver);
+        empty.addEventListener('dragenter', dragEnter);
+        empty.addEventListener('dragleave', dragLeave);
+        empty.addEventListener('drop', dragDrop);
+      });
+
+      fillElements.forEach((fillEl) => fillEl.addEventListener('dragstart', dragStart));
+      fillElements.forEach((fillEl) => fillEl.addEventListener('dragend', dragEnd));
     }
-
-    emptiesElements.forEach((empty) => {
-      empty.addEventListener('dragover', dragOver);
-      empty.addEventListener('dragenter', dragEnter);
-      empty.addEventListener('dragleave', dragLeave);
-      empty.addEventListener('drop', dragDrop);
-    });
-
-    fillElements.forEach((fillEl) => fillEl.addEventListener('dragstart', dragStart));
-    fillElements.forEach((fillEl) => fillEl.addEventListener('dragend', dragEnd));
   }
 
   createMain() {
@@ -302,6 +307,7 @@ export default class Calendar {
     const members = JSON.parse(localStorage.getItem('members'));
     const newCurrentUser = members.find(({ name }) => name === newName);
     this.currentUser = newCurrentUser;
+    this.isAdmin = this.currentUser.isAdmin;
   }
 
   renderModalChooseUser() {
@@ -316,7 +322,15 @@ export default class Calendar {
 
     createItemMember(this.members, menuContentMember);
 
-    createModalDialog(this.root, 'Please authorise', (name) => this.setCurrentUser(name), form);
+    createModalDialog(this.root, 'Please authorise', (name) => {
+      this.setCurrentUser(name);
+
+      if (this.isAdmin) {
+        this.btnAddMember.classList.remove('hide');
+        this.btnAddItem.classList.remove('hide');
+        this.generateToDoItems(this.todos);
+      }
+    }, form);
 
     menuMember.addEventListener('click', ({ target }) => {
       if (target.classList.contains('menu__title')) {
@@ -343,10 +357,10 @@ export default class Calendar {
 
     this.createHeader();
     await this.generateMembers(this.membersContainer);
+    this.renderModalChooseUser();
     this.createMain();
     createFooter(this.root);
     this.handlerInputMembers();
-    this.renderModalChooseUser();
   }
 
   async render() {
