@@ -290,6 +290,11 @@ export default class Calendar {
     this.handlerInputMembers();
   }
 
+  handlerAddNewMember(name) {
+    const newMember = new User(name);
+
+  }
+
   async render() {
     await this.init();
 
@@ -334,7 +339,14 @@ export default class Calendar {
 
     // Handle add member
     this.btnAddMember.addEventListener('click', () => {
-      console.log('add member');
+
+      const form = create('form', 'modal-form', null, null, ['name', 'modal-form']);
+      const memberContainer = create('div', 'modal-form_line', null, form);
+      create('p', 'modal-form_label', 'Member', memberContainer);
+      create('input', 'modal-form__input', null, memberContainer,
+        ['type', 'text'], ['tab-index', '1'], ['name', 'memberName'], ['placeholder', 'add member']);
+
+      createModalDialog(this.root, `Create new user`, (name) => console.log('add member', name), form);
     });
 
     document.querySelector('.author:nth-of-type(2)').addEventListener('click',
