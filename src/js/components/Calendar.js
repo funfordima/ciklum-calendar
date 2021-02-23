@@ -27,7 +27,7 @@ export default class Calendar {
     const form = create('form', 'header__form', null, navContainer, ['name', 'members-form']);
     const btnContainer = create('div', 'event-btn__container', null, form);
     this.menu = create('div', 'menu', null, form, ['data-state', '']);
-    const menuContent = create('div', 'menu__content', null, this.menu);
+    this.membersContainer = create('div', 'menu__content', null, this.menu);
 
     this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', ''], ['tabindex', 0]);
     create('div', 'menu__container', this.menu, form);
@@ -36,12 +36,11 @@ export default class Calendar {
     this.resetMenuBtn = create('input', 'event-btn reset-event', null, btnContainer,
       ['type', 'reset'], ['value', 'Clear it!']);
     create('a', 'header__title_link', 'Calendar', headerTitle, ['href', '#'], ['alt', 'logo link']);
-
-    return menuContent;
   }
 
-  async createMembers() {
-
+  async createMembers(parentElement) {
+    parentElement.innerHTML = '';
+    this.generateMembers(parentElement);
   }
 
   async generateMembers(parentElement) {
@@ -280,8 +279,22 @@ export default class Calendar {
 
   handlerAddNewMember(name) {
     const newMember = new User(name);
+    const members = JSON.parse(localStorage.getItem('members'));
+    members.push(newMember);
 
+    Data.sendData(URL_MEMBERS, members)
+      .then(() => {
+        localStorage.setItem('members', JSON.stringify(members));
+        const msg = successMsg('Done!', this.root);
+        this.createMembers(this.membersContainer);
 
+        setTimeout(() => this.root.removeChild(msg), 2000);
+      })
+      .catch((error) => {
+        const msg = errorMsg(error.message, this.root);
+
+        setTimeout(() => this.root.removeChild(msg), 2000);
+      });
   }
 
   async init() {
@@ -289,31 +302,17 @@ export default class Calendar {
     this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
     localStorage.setItem('events', JSON.stringify(this.todos));
 
-    const memebersListContainer = this.createHeader();
-    this.generateMembers(memebersListContainer);
+    this.createHeader();
+    this.generateMembers(this.membersContainer);
     this.createMain();
     createFooter(this.root);
     this.handlerInputMembers();
 
     // const ivan = new User('Ivan');
-    // const members = JSON.parse(localStorage.getItem('members'));
+    // 
     // // members.push(new User('Nick'));
     // console.log(members.filter(item => item != null));
     // members.push(new Admin('Tamara'));
-
-    // Data.sendData(URL_MEMBERS, members.filter(item => item != null))
-    //   .then(() => {
-    //     localStorage.setItem('members', JSON.stringify(members));
-    //     const msg = successMsg('Done!', this.root);
-    //     // Rerender ItemToDo
-
-    //     setTimeout(() => this.root.removeChild(msg), 2000);
-    //   })
-    //   .catch((error) => {
-    //     const msg = errorMsg(error.message, this.root);
-
-    //     setTimeout(() => this.root.removeChild(msg), 2000);
-    //   });
 
   }
 
@@ -370,7 +369,7 @@ export default class Calendar {
       create('input', 'modal-form__input', null, memberContainer,
         ['type', 'text'], ['tab-index', '1'], ['name', 'memberName'], ['placeholder', 'add member']);
 
-      createModalDialog(this.root, `Create new user`, (name) => console.log('add member', name), form);
+      createModalDialog(this.root, `Create new user`, (name) => this.handlerAddNewMember(name), form);
     });
 
     document.querySelector('.author:nth-of-type(2)').addEventListener('click',
