@@ -71,6 +71,8 @@ html {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-direction: column;
+      row-gap: 1.5rem;
 
       @media (max-width: 1000px) {
         width: 60%;
@@ -88,33 +90,42 @@ html {
 }
 
 .event-btn {
-  &-add,
-  &-reset {
-    display: flex;
-    width: 23rem;
-    padding: 0.8rem 1.6rem;
-    margin: 0 auto;
-    border: solid 1px #c7ccd1;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease-out;
-    cursor: pointer;
-    font-weight: bold;
-    background-color: #ffffff;
-    color: #333333;
+  display: flex;
+  width: 23rem;
+  padding: 0.8rem 1.6rem;
+  margin: 0 auto;
+  border: solid 1px #c7ccd1;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #ffffff;
+  color: #333333;
 
-    &:hover {
-      background-color: #d32f2f;
-      color: #ffffff;
-    }
-
-    @media (max-width: 767px) {
-      padding: 0.5rem 1rem;
-      width: 18rem;
-    }
+  &:hover {
+    color: #ffffff;
   }
 
-  &-add:hover {
+  @media (max-width: 767px) {
+    padding: 0.5rem 1rem;
+    width: 18rem;
+  }
+
+  &.reset-event:hover {
+    background-color: #d32f2f;
+  }
+
+  &.add-event:hover {
     background-color: #81c784;
+  }
+
+  &.add-member {
+    margin-right: 0;
+    width: 16rem;
+
+    &:hover {
+      background-color: #81a2c7;
+    }
   }
 
   &__container {

@@ -2,6 +2,7 @@ import create from '../utils/create';
 import createNewItem from './createNewItem';
 import createItemMember from '../utils/createItemMember';
 import { URL_EVENTS, URL_MEMBERS, message } from '../constants/constants';
+import { User, Admin } from '../utils/UserService';
 import Data from '../utils/data';
 import { successMsg, errorMsg } from './statusMsg';
 import createModalDialog from '../utils/createModalDialog';
@@ -21,6 +22,8 @@ export default class Calendar {
     const header = create('header', 'header', null, this.root);
     const headerTitle = create('h1', 'header__title', null, header);
     const navContainer = create('div', 'header__form_container', null, header);
+    this.btnAddMember = create('button', 'event-btn add-member', 'New Member +', navContainer,
+      ['type', 'submit'], ['value', 'New Member +']);
     const form = create('form', 'header__form', null, navContainer, ['name', 'members-form']);
     const btnContainer = create('div', 'event-btn__container', null, form);
     this.menu = create('div', 'menu', null, form, ['data-state', '']);
@@ -28,13 +31,17 @@ export default class Calendar {
 
     this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', '']);
     create('div', 'menu__container', this.menu, form);
-    this.btnAddItem = create('input', 'event-btn-add', null, btnContainer,
+    this.btnAddItem = create('input', 'event-btn add-event', null, btnContainer,
       ['type', 'submit'], ['value', 'New Event +']);
-    this.resetMenuBtn = create('input', 'event-btn-reset', null, btnContainer,
+    this.resetMenuBtn = create('input', 'event-btn reset-event', null, btnContainer,
       ['type', 'reset'], ['value', 'Clear it!']);
     create('a', 'header__title_link', 'Calendar', headerTitle, ['href', '#'], ['alt', 'logo link']);
 
     return menuContent;
+  }
+
+  async createMembers() {
+
   }
 
   async generateMembers(parentElement) {
@@ -323,6 +330,11 @@ export default class Calendar {
         this.generateToDoItems(eventsList);
         this.todos = eventsList;
       });
+    });
+
+    // Handle add member
+    this.btnAddMember.addEventListener('click', () => {
+      console.log('add member');
     });
 
     document.querySelector('.author:nth-of-type(2)').addEventListener('click',
