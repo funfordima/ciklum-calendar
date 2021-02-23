@@ -2,7 +2,7 @@ import create from '../utils/create';
 import createNewItem from './createNewItem';
 import createItemMember from '../utils/createItemMember';
 import { URL_EVENTS, URL_MEMBERS, message } from '../constants/constants';
-import { User, Admin } from '../utils/UserService';
+import User from '../utils/User';
 import Data from '../utils/data';
 import { successMsg, errorMsg } from './statusMsg';
 import createModalDialog from '../utils/createModalDialog';
@@ -302,11 +302,10 @@ export default class Calendar {
     const members = JSON.parse(localStorage.getItem('members'));
     const newCurrentUser = members.find(({ name }) => name === newName);
     this.currentUser = newCurrentUser;
-    console.log(this.currentUser);
   }
 
   renderModalChooseUser() {
-    // Choose user  
+    // Choose user
     const form = create('form', 'modal-form', null, null, ['name', 'modal-form']);
     const memberContainer = create('div', 'modal-form_line', null, form);
     // Members input
@@ -317,7 +316,7 @@ export default class Calendar {
 
     createItemMember(this.members, menuContentMember);
 
-    createModalDialog(this.root, `Please authorise`, (name) => this.setCurrentUser(name), form);
+    createModalDialog(this.root, 'Please authorise', (name) => this.setCurrentUser(name), form);
 
     menuMember.addEventListener('click', ({ target }) => {
       if (target.classList.contains('menu__title')) {
@@ -367,7 +366,7 @@ export default class Calendar {
       this.menuTitle.textContent = this.menuTitle.getAttribute('data-default');
 
       this.todos.map((todo) => {
-        const members = this.members.map(item => item.name);
+        const members = this.members.map((item) => item.name);
 
         todo.participants.forEach((member) => {
           if (members.includes(member)) {
@@ -396,14 +395,13 @@ export default class Calendar {
 
     // Handle add member
     this.btnAddMember.addEventListener('click', () => {
-
       const form = create('form', 'modal-form', null, null, ['name', 'modal-form']);
       const memberContainer = create('div', 'modal-form_line', null, form);
       create('p', 'modal-form_label', 'Member', memberContainer);
       create('input', 'modal-form__input', null, memberContainer,
         ['type', 'text'], ['tab-index', '1'], ['name', 'memberName'], ['placeholder', 'add member']);
 
-      createModalDialog(this.root, `Create new user`, (name) => this.handlerAddNewMember(name), form);
+      createModalDialog(this.root, 'Create new user', (name) => this.handlerAddNewMember(name), form);
     });
 
     document.querySelector('.author:nth-of-type(2)').addEventListener('click',

@@ -1,5 +1,5 @@
 import create from './create';
-import { successMsg, errorMsg } from '../components/statusMsg';
+import { errorMsg } from '../components/statusMsg';
 
 const createModalDialog = (parentElement, msg, callback, child = null) => {
   const overlay = create('div', 'overlay', null, parentElement);
@@ -16,7 +16,9 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
     textContainer.insertAdjacentElement('beforeend', child);
 
     const inputUser = textContainer.querySelector('.modal-form__input');
-    inputUser && inputUser.focus();
+    if (inputUser) {
+      inputUser.focus();
+    }
 
     textContainer.querySelector('.modal-form').addEventListener('submit', (event) => {
       event.preventDefault();
@@ -44,35 +46,37 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
   });
 
   const inputUser = textContainer.querySelector('.modal-form__input');
-  inputUser && inputUser.addEventListener('blur', ({ target }) => {
-    const newName = target.value;
-    const minNameLength = 2;
+  if (inputUser) {
+    inputUser.addEventListener('blur', ({ target }) => {
+      const newName = target.value;
+      const minNameLength = 2;
 
-    if (newName.trim().length < minNameLength) {
-      const msg = errorMsg('Please type correct name', textContainer);
-      btnSubmit.disabled = true;
+      if (newName.trim().length < minNameLength) {
+        const msgError = errorMsg('Please type correct name', textContainer);
+        btnSubmit.disabled = true;
 
-      setTimeout(() => {
-        textContainer.removeChild(msg);
-      }, 2000);
-    }
-  });
+        setTimeout(() => {
+          textContainer.removeChild(msgError);
+        }, 2000);
+      }
+    });
 
-  inputUser && inputUser.addEventListener('change', ({ target }) => {
-    const members = JSON.parse(localStorage.getItem('members'));
-    const condition = members.find(({ name }) => name === target.value);
+    inputUser.addEventListener('change', ({ target }) => {
+      const members = JSON.parse(localStorage.getItem('members'));
+      const condition = members.find(({ name }) => name === target.value);
 
-    if (condition) {
-      const msg = errorMsg('Entered name already exists', textContainer);
-      btnSubmit.disabled = true;
+      if (condition) {
+        const msgError = errorMsg('Entered name already exists', textContainer);
+        btnSubmit.disabled = true;
 
-      setTimeout(() => {
-        textContainer.removeChild(msg);
-      }, 2000);
-    } else {
-      btnSubmit.disabled = false;
-    }
-  });
+        setTimeout(() => {
+          textContainer.removeChild(msgError);
+        }, 2000);
+      } else {
+        btnSubmit.disabled = false;
+      }
+    });
+  }
 };
 
 export default createModalDialog;
