@@ -1,6 +1,6 @@
 export class User {
   constructor(name) {
-    this.id = '1';
+    this.id = `f${(+new Date()).toString(16)}`;
     this.name = name;
     this.isActive = true;
   }
