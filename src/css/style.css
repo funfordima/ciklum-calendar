@@ -687,7 +687,7 @@ html {
 .modal-form__btn:disabled {
   -webkit-box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.1);
           box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.1);
-  cursor: none;
+  cursor: auto;
 }
 
 .modal__close-btn {

@@ -29,7 +29,7 @@ export default class Calendar {
     this.menu = create('div', 'menu', null, form, ['data-state', '']);
     const menuContent = create('div', 'menu__content', null, this.menu);
 
-    this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', '']);
+    this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', ''], ['tabindex', 0]);
     create('div', 'menu__container', this.menu, form);
     this.btnAddItem = create('input', 'event-btn add-event', null, btnContainer,
       ['type', 'submit'], ['value', 'New Event +']);
@@ -71,7 +71,7 @@ export default class Calendar {
         ['data-complete', complete], ['data-day', day], ['data-time', time], ['title', participants.join(' ')],
         ['draggable', complete]);
       create('h3', 'main__item_title', title, todoContainer);
-      create('div', 'main__item_btn-close', '&times;', todoContainer);
+      create('div', 'main__item_btn-close', '&times;', todoContainer, ['tabindex', '0']);
     });
 
     let isDragging = null;
@@ -264,7 +264,7 @@ export default class Calendar {
       Data.sendData(URL_EVENTS, this.todos)
         .then(() => {
           localStorage.setItem('events', JSON.stringify(this.todos));
-          const msg = successMsg('Готово!', this.root);
+          const msg = successMsg('Done!', this.root);
           // Rerender ItemToDo
           this.generateToDoItems(this.todos);
 
@@ -278,6 +278,12 @@ export default class Calendar {
     }
   }
 
+  handlerAddNewMember(name) {
+    const newMember = new User(name);
+
+
+  }
+
   async init() {
     this.todos = await Data.getData(URL_EVENTS);
     this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
@@ -288,10 +294,26 @@ export default class Calendar {
     this.createMain();
     createFooter(this.root);
     this.handlerInputMembers();
-  }
 
-  handlerAddNewMember(name) {
-    const newMember = new User(name);
+    // const ivan = new User('Ivan');
+    // const members = JSON.parse(localStorage.getItem('members'));
+    // // members.push(new User('Nick'));
+    // console.log(members.filter(item => item != null));
+    // members.push(new Admin('Tamara'));
+
+    // Data.sendData(URL_MEMBERS, members.filter(item => item != null))
+    //   .then(() => {
+    //     localStorage.setItem('members', JSON.stringify(members));
+    //     const msg = successMsg('Done!', this.root);
+    //     // Rerender ItemToDo
+
+    //     setTimeout(() => this.root.removeChild(msg), 2000);
+    //   })
+    //   .catch((error) => {
+    //     const msg = errorMsg(error.message, this.root);
+
+    //     setTimeout(() => this.root.removeChild(msg), 2000);
+    //   });
 
   }
 
@@ -302,7 +324,7 @@ export default class Calendar {
     this.contentContainer.addEventListener('click', ({ target }) => {
       if (target.classList.contains('main__item_btn-close')) {
         const eventTitle = target.previousElementSibling.textContent;
-        createModalDialog(this.root, `Вы уверены, что хотите удалить ивент ${eventTitle}?`,
+        createModalDialog(this.root, `Are you sure you want to delete the event: ${eventTitle}?`,
           this.handlerDeleteEvent.bind(this, target.parentElement));
       }
     });
@@ -312,8 +334,10 @@ export default class Calendar {
       this.menuTitle.textContent = this.menuTitle.getAttribute('data-default');
 
       this.todos.map((todo) => {
+        const members = this.members.map(item => item.name);
+
         todo.participants.forEach((member) => {
-          if (this.members.includes(member)) {
+          if (members.includes(member)) {
             todo.complete = true;
           } else {
             todo.complete = false;

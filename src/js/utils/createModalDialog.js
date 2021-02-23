@@ -6,11 +6,11 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
   const modal = create('div', 'modal msg', null, overlay);
   const textContainer = create('div', 'modal-form_line -column', null, modal);
   const buttonContainer = create('div', 'modal-form_line', null, modal);
-  create('h3', 'modal__text', msg, textContainer, ['tab-index', '1']);
+  create('h3', 'modal__text', msg, textContainer, ['tabindex', '1']);
   const btnSubmit = create('input', 'modal-form__btn submit-button state-0', null, buttonContainer,
-    ['type', 'button'], ['value', 'Confirm'], ['name', 'modal-submit'], ['tab-index', '2'], ['aria-label', 'Confirm']);
+    ['type', 'button'], ['value', 'Confirm'], ['name', 'modal-submit'], ['tabindex', '2'], ['aria-label', 'Confirm']);
   create('input', 'modal-form__btn cancel-button', null, buttonContainer,
-    ['type', 'button'], ['value', 'Cancel'], ['name', 'modal-cancel'], ['tab-index', '3'], ['aria-label', 'Cancel']);
+    ['type', 'button'], ['value', 'Cancel'], ['name', 'modal-cancel'], ['tabindex', '3'], ['aria-label', 'Cancel']);
 
   if (child) {
     textContainer.insertAdjacentElement('beforeend', child);
@@ -37,8 +37,6 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
   textContainer.querySelector('.modal-form__input').addEventListener('blur', ({ target }) => {
     const newName = target.value;
     const minNameLength = 2;
-    const members = JSON.parse(localStorage.getItem('members'));
-    const condition = members.find(({ name }) => name === newName);
 
     if (newName.trim().length < minNameLength) {
       const msg = errorMsg('Please type correct name', textContainer);
@@ -50,7 +48,21 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
     }
   });
 
-  textContainer.querySelector('.modal-form__input').addEventListener('change', () => btnSubmit.disabled = false);
+  textContainer.querySelector('.modal-form__input').addEventListener('change', ({ target }) => {
+    const members = JSON.parse(localStorage.getItem('members'));
+    const condition = members.find(({ name }) => name === target.value);
+
+    if (condition) {
+      const msg = errorMsg('Entered name already exists', textContainer);
+      btnSubmit.disabled = true;
+
+      setTimeout(() => {
+        textContainer.removeChild(msg);
+      }, 2000);
+    } else {
+      btnSubmit.disabled = false;
+    }
+  });
 };
 
 export default createModalDialog;

@@ -22,38 +22,39 @@ const createNewItem = (main, members, days, times, renderMainFunc, isReplace = f
   create('p', 'modal-form_label', 'Time', timeContainer);
 
   const titleInput = create('input', 'modal-form__input', null, titleContainer,
-    ['type', 'text'], ['tab-index', '1'], ['name', 'eventName'], ['placeholder', 'Event']);
+    ['type', 'text'], ['tabindex', '1'], ['name', 'eventName'], ['placeholder', 'Event']);
+  titleInput.focus();
 
   // Members input
-  const menuMember = create('div', 'menu', null, memberContainer, ['data-state', '']);
+  const menuMember = create('div', 'menu', null, memberContainer, ['data-state', ''], ['tabindex', '2']);
   const menuContentMember = create('div', 'menu__content', null, menuMember);
   const menuTitleMember = create('div', 'menu__title', null, menuMember, ['data-default', '']);
-  menuTitleMember.setAttribute('tab-index', '2');
+  menuTitleMember.setAttribute('tabindex', '0');
   createItemMember(members, menuContentMember);
 
   menuContentMember.querySelectorAll('input').forEach((inputEl) => inputEl.setAttribute('type', 'checkbox'));
   menuContentMember.querySelectorAll('label').forEach((labelEl) => labelEl.classList.add('member'));
 
   // Day input
-  const menuDays = create('div', 'menu', null, dayContainer, ['data-state', '']);
+  const menuDays = create('div', 'menu', null, dayContainer, ['data-state', ''], ['tabindex', '3']);
   const menuContentDays = create('div', 'menu__content', null, menuDays);
   const menuTitleDays = create('div', 'menu__title', null, menuDays, ['data-default', '']);
-  menuTitleDays.setAttribute('tab-index', '3');
+  menuTitleDays.setAttribute('tabindex', '0');
   createItemMember(days.slice(1), menuContentDays);
 
   // Time input
-  const menuTime = create('div', 'menu', null, timeContainer, ['data-state', '']);
+  const menuTime = create('div', 'menu', null, timeContainer, ['data-state', ''], ['tabindex', '4']);
   const menuContentTime = create('div', 'menu__content', null, menuTime);
   const menuTitleTime = create('div', 'menu__title', null, menuTime, ['data-default', '']);
-  menuTitleTime.setAttribute('tab-index', '4');
+  menuTitleTime.setAttribute('tabindex', '0');
   createItemMember(times, menuContentTime);
 
   // Buttons
   const btnSubmit = create('button', 'modal-form__btn submit-button state-0', null, buttonContainer,
-    ['type', 'submit'], ['name', 'modal-form-submit'], ['tab-index', '5']);
+    ['type', 'submit'], ['name', 'modal-form-submit'], ['tabindex', '5']);
   create('input', 'modal-form__btn cancel-button', null, buttonContainer,
-    ['type', 'button'], ['value', 'Cancel'], ['name', 'modal-form-cancel'], ['tab-index', '6']);
-  create('button', 'modal__close-btn', '&times', modal, ['type', 'button'], ['tab-index', '7']);
+    ['type', 'button'], ['value', 'Cancel'], ['name', 'modal-form-cancel'], ['tabindex', '6']);
+  create('button', 'modal__close-btn', '&times', modal, ['type', 'button'], ['tabindex', '7']);
   create('span', 'pre-state-msg', 'Submit', btnSubmit);
   create('span', 'current-state-msg hide', 'Sending...', btnSubmit);
   create('span', 'done-state-msg hide', 'Done!', btnSubmit);

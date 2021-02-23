@@ -7,8 +7,8 @@ export class User {
 }
 
 export class Admin extends User {
-  constructor() {
-    super();
+  constructor(name) {
+    super(name);
     this.isAdmin = true;
   }
 }
