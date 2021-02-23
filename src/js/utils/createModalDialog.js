@@ -25,7 +25,15 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
 
   overlay.addEventListener('click', ({ target }) => {
     if (target.classList.contains('submit-button')) {
-      const name = textContainer.querySelector('.modal-form__input').value.trim();
+      let name = null;
+      const nameContainer = textContainer.querySelector('.modal-form__input');
+      const titleContainer = textContainer.querySelector('.menu__title');
+      if (nameContainer) {
+        name = nameContainer.value.trim();
+      } else {
+        name = titleContainer.textContent;
+      }
+
       callback(name);
       parentElement.removeChild(overlay);
     }

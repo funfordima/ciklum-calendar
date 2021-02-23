@@ -16,6 +16,7 @@ export default class Calendar {
     this.todos = [];
     this.members = [];
     this.contentContainer = '';
+    this.currentUser = null;
   }
 
   createHeader() {
@@ -297,17 +298,14 @@ export default class Calendar {
       });
   }
 
-  async init() {
-    this.todos = await Data.getData(URL_EVENTS);
-    this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
-    localStorage.setItem('events', JSON.stringify(this.todos));
+  setCurrentUser(newName) {
+    const members = JSON.parse(localStorage.getItem('members'));
+    const newCurrentUser = members.find(({ name }) => name === newName);
+    this.currentUser = newCurrentUser;
+    console.log(this.currentUser);
+  }
 
-    this.createHeader();
-    await this.generateMembers(this.membersContainer);
-    this.createMain();
-    createFooter(this.root);
-    this.handlerInputMembers();
-
+  renderModalChooseUser() {
     // Choose user  
     const form = create('form', 'modal-form', null, null, ['name', 'modal-form']);
     const memberContainer = create('div', 'modal-form_line', null, form);
@@ -319,7 +317,7 @@ export default class Calendar {
 
     createItemMember(this.members, menuContentMember);
 
-    createModalDialog(this.root, `Please authorise`, (name) => console.log('choose', name), form);
+    createModalDialog(this.root, `Please authorise`, (name) => this.setCurrentUser(name), form);
 
     menuMember.addEventListener('click', ({ target }) => {
       if (target.classList.contains('menu__title')) {
@@ -337,6 +335,19 @@ export default class Calendar {
         menuMember.setAttribute('data-state', '');
       }
     });
+  }
+
+  async init() {
+    this.todos = await Data.getData(URL_EVENTS);
+    this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
+    localStorage.setItem('events', JSON.stringify(this.todos));
+
+    this.createHeader();
+    await this.generateMembers(this.membersContainer);
+    this.createMain();
+    createFooter(this.root);
+    this.handlerInputMembers();
+    this.renderModalChooseUser();
   }
 
   async render() {
