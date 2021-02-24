@@ -1,5 +1,5 @@
 import create from '../utils/create';
-import createItemMember from '../utils/createItemMember';
+import createDropDownList from './createDropDownList';
 import Data from '../utils/data';
 import { URL_EVENTS, message } from '../constants/constants';
 import { successMsg, errorMsg } from './statusMsg';
@@ -25,29 +25,14 @@ const createNewItem = (main, members, days, times, renderMainFunc, isReplace = f
     ['type', 'text'], ['tabindex', '1'], ['name', 'eventName'], ['placeholder', 'Event']);
   titleInput.focus();
 
-  // Members input
-  const menuMember = create('div', 'menu', null, memberContainer, ['data-state', ''], ['tabindex', '2']);
-  const menuContentMember = create('div', 'menu__content', null, menuMember);
-  const menuTitleMember = create('div', 'menu__title', null, menuMember, ['data-default', '']);
-  menuTitleMember.setAttribute('tabindex', '0');
-  createItemMember(members, menuContentMember);
+  // Create Member Day Time inputs
+  const menuTitleMember = createDropDownList(memberContainer, members);
+  const menuTitleDays = createDropDownList(dayContainer, days.slice(1));
+  const menuTitleTime = createDropDownList(timeContainer, times);
 
+  const menuContentMember = memberContainer.querySelector('.menu__content');
   menuContentMember.querySelectorAll('input').forEach((inputEl) => inputEl.setAttribute('type', 'checkbox'));
   menuContentMember.querySelectorAll('label').forEach((labelEl) => labelEl.classList.add('member'));
-
-  // Day input
-  const menuDays = create('div', 'menu', null, dayContainer, ['data-state', ''], ['tabindex', '3']);
-  const menuContentDays = create('div', 'menu__content', null, menuDays);
-  const menuTitleDays = create('div', 'menu__title', null, menuDays, ['data-default', '']);
-  menuTitleDays.setAttribute('tabindex', '0');
-  createItemMember(days.slice(1), menuContentDays);
-
-  // Time input
-  const menuTime = create('div', 'menu', null, timeContainer, ['data-state', ''], ['tabindex', '4']);
-  const menuContentTime = create('div', 'menu__content', null, menuTime);
-  const menuTitleTime = create('div', 'menu__title', null, menuTime, ['data-default', '']);
-  menuTitleTime.setAttribute('tabindex', '0');
-  createItemMember(times, menuContentTime);
 
   // Buttons
   const btnSubmit = create('button', 'modal-form__btn submit-button state-0', null, buttonContainer,

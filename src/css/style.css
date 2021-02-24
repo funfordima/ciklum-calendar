@@ -151,7 +151,7 @@ html {
   color: #ffffff;
 }
 
-.event-btn.hover {
+.event-btn.hide {
   display: none;
 }
 

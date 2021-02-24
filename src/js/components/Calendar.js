@@ -1,6 +1,7 @@
 import create from '../utils/create';
 import createNewItem from './createNewItem';
 import createItemMember from '../utils/createItemMember';
+import createDropDownList from './createDropDownList';
 import { URL_EVENTS, URL_MEMBERS, message } from '../constants/constants';
 import User from '../utils/User';
 import Data from '../utils/data';
@@ -72,11 +73,15 @@ export default class Calendar {
       const todoContainer = create('div', 'main__item', null, todoWrapper,
         ['data-complete', complete], ['data-day', day], ['data-time', time], ['title', participants.join(' ')],
         ['draggable', complete]);
+
+      if (!this.isAdmin) {
+        todoContainer.setAttribute('draggable', false);
+      }
+
       create('h3', 'main__item_title', title, todoContainer);
       create('div', 'main__item_btn-close', '&times;', todoContainer, ['tabindex', '0']);
     });
 
-    console.log(this.currentUser);
     if (this.isAdmin) {
       let isDragging = null;
       const fillElements = this.contentContainer.querySelectorAll('div[draggable="true"]');
@@ -314,13 +319,10 @@ export default class Calendar {
     // Choose user
     const form = create('form', 'modal-form', null, null, ['name', 'modal-form']);
     const memberContainer = create('div', 'modal-form_line', null, form);
-    // Members input
-    const menuMember = create('div', 'menu', null, memberContainer, ['data-state', ''], ['tabindex', '2']);
-    const menuContentMember = create('div', 'menu__content', null, menuMember);
-    const menuTitleMember = create('div', 'menu__title', null, menuMember, ['data-default', '']);
-    menuTitleMember.setAttribute('tabindex', '0');
 
-    createItemMember(this.members, menuContentMember);
+    // Members input
+    const menuTitleMember = createDropDownList(memberContainer, this.members);
+    const menuMember = memberContainer.querySelector('.menu');
 
     createModalDialog(this.root, 'Please authorise', (name) => {
       this.setCurrentUser(name);
