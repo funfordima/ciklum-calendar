@@ -1,7 +1,9 @@
 import create from '../utils/create';
 import createNewItem from './createNewItem';
 import createItemMember from '../utils/createItemMember';
+import createDropDownList from './createDropDownList';
 import { URL_EVENTS, URL_MEMBERS, message } from '../constants/constants';
+import User from '../utils/User';
 import Data from '../utils/data';
 import { successMsg, errorMsg } from './statusMsg';
 import createModalDialog from '../utils/createModalDialog';
@@ -15,26 +17,32 @@ export default class Calendar {
     this.todos = [];
     this.members = [];
     this.contentContainer = '';
+    this.currentUser = null;
+    this.isAdmin = false;
   }
 
   createHeader() {
     const header = create('header', 'header', null, this.root);
-    const headerTitle = create('h1', 'header__title', null, header);
+    const headerTitle = create('h1', 'header__title hvr-float-shadow', null, header);
     const navContainer = create('div', 'header__form_container', null, header);
+    const btnContainer = create('div', 'event-btn__container --large', null, navContainer);
+    this.btnAddMember = create('button', 'event-btn add-member hide hvr-shutter-out-vertical', 'New Member +', btnContainer,
+      ['type', 'submit'], ['value', 'New Member +']);
+    this.btnChangeUser = create('button', 'event-btn change-member hvr-sweep-to-right', 'Change User', btnContainer,
+      ['type', 'submit'], ['value', 'Change User']);
     const form = create('form', 'header__form', null, navContainer, ['name', 'members-form']);
-    const btnContainer = create('div', 'event-btn__container', null, form);
+    const btnFormContainer = create('div', 'event-btn__container', null, form);
     this.menu = create('div', 'menu', null, form, ['data-state', '']);
-    const menuContent = create('div', 'menu__content', null, this.menu);
+    this.membersContainer = create('div', 'menu__content', null, this.menu);
 
-    this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', '']);
+    this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', ''], ['tabindex', 0]);
     create('div', 'menu__container', this.menu, form);
-    this.btnAddItem = create('input', 'event-btn-add', null, btnContainer,
+    this.btnAddItem = create('input', 'event-btn add-event hide', null, btnFormContainer,
       ['type', 'submit'], ['value', 'New Event +']);
-    this.resetMenuBtn = create('input', 'event-btn-reset', null, btnContainer,
+
+    this.resetMenuBtn = create('input', 'event-btn reset-event', null, btnFormContainer,
       ['type', 'reset'], ['value', 'Clear it!']);
     create('a', 'header__title_link', 'Calendar', headerTitle, ['href', '#'], ['alt', 'logo link']);
-
-    return menuContent;
   }
 
   async generateMembers(parentElement) {
@@ -47,6 +55,11 @@ export default class Calendar {
       .forEach((el, indx) => el.setAttribute('id', `${this.members[indx]}_header`));
     document.querySelectorAll('.menu__content label')
       .forEach((el, indx) => el.setAttribute('for', `${this.members[indx]}_header`));
+  }
+
+  async createMembers(parentElement) {
+    parentElement.innerHTML = '';
+    this.generateMembers(parentElement);
   }
 
   /* eslint no-param-reassign: ["error", { "props": false }] */
@@ -63,13 +76,16 @@ export default class Calendar {
       const todoContainer = create('div', 'main__item', null, todoWrapper,
         ['data-complete', complete], ['data-day', day], ['data-time', time], ['title', participants.join(' ')],
         ['draggable', complete]);
+
+      if (!this.isAdmin) {
+        todoContainer.setAttribute('draggable', false);
+      }
+
       create('h3', 'main__item_title', title, todoContainer);
-      create('div', 'main__item_btn-close', '&times;', todoContainer);
+      create('div', 'main__item_btn-close', '&times;', todoContainer, ['tabindex', '0']);
     });
 
     let isDragging = null;
-    const fillElements = this.contentContainer.querySelectorAll('div[draggable="true"]');
-    const emptiesElements = this.contentContainer.querySelectorAll('div[draggable="false"]');
     const rerenderMain = this.generateToDoItems.bind(this);
 
     function dragStart() {
@@ -170,15 +186,20 @@ export default class Calendar {
       isDragging = null;
     }
 
-    emptiesElements.forEach((empty) => {
-      empty.addEventListener('dragover', dragOver);
-      empty.addEventListener('dragenter', dragEnter);
-      empty.addEventListener('dragleave', dragLeave);
-      empty.addEventListener('drop', dragDrop);
-    });
+    if (this.isAdmin) {
+      const fillElements = this.contentContainer.querySelectorAll('div[draggable="true"]');
+      const emptiesElements = this.contentContainer.querySelectorAll('div[draggable="false"]');
 
-    fillElements.forEach((fillEl) => fillEl.addEventListener('dragstart', dragStart));
-    fillElements.forEach((fillEl) => fillEl.addEventListener('dragend', dragEnd));
+      emptiesElements.forEach((empty) => {
+        empty.addEventListener('dragover', dragOver);
+        empty.addEventListener('dragenter', dragEnter);
+        empty.addEventListener('dragleave', dragLeave);
+        empty.addEventListener('drop', dragDrop);
+      });
+
+      fillElements.forEach((fillEl) => fillEl.addEventListener('dragstart', dragStart));
+      fillElements.forEach((fillEl) => fillEl.addEventListener('dragend', dragEnd));
+    }
   }
 
   createMain() {
@@ -257,7 +278,7 @@ export default class Calendar {
       Data.sendData(URL_EVENTS, this.todos)
         .then(() => {
           localStorage.setItem('events', JSON.stringify(this.todos));
-          const msg = successMsg('Готово!', this.root);
+          const msg = successMsg('Done!', this.root);
           // Rerender ItemToDo
           this.generateToDoItems(this.todos);
 
@@ -271,13 +292,79 @@ export default class Calendar {
     }
   }
 
+  handlerAddNewMember(name) {
+    const newMember = new User(name);
+    const members = JSON.parse(localStorage.getItem('members'));
+    members.push(newMember);
+
+    Data.sendData(URL_MEMBERS, members)
+      .then(() => {
+        localStorage.setItem('members', JSON.stringify(members));
+        const msg = successMsg('Done!', this.root);
+        this.createMembers(this.membersContainer);
+
+        setTimeout(() => this.root.removeChild(msg), 2000);
+      })
+      .catch((error) => {
+        const msg = errorMsg(error.message, this.root);
+
+        setTimeout(() => this.root.removeChild(msg), 2000);
+      });
+  }
+
+  setCurrentUser(newName) {
+    const members = JSON.parse(localStorage.getItem('members'));
+    const newCurrentUser = members.find(({ name }) => name === newName);
+    this.currentUser = newCurrentUser;
+    this.isAdmin = this.currentUser.isAdmin;
+  }
+
+  renderModalChooseUser() {
+    // Choose user
+    const form = create('form', 'modal-form', null, null, ['name', 'modal-form']);
+    const memberContainer = create('div', 'modal-form_line', null, form);
+
+    // Members input
+    const menuTitleMember = createDropDownList(memberContainer, this.members);
+    const menuMember = memberContainer.querySelector('.menu');
+
+    createModalDialog(this.root, 'Please authorise', (name) => {
+      this.setCurrentUser(name);
+
+      if (this.isAdmin) {
+        this.btnAddMember.classList.remove('hide');
+        this.btnAddItem.classList.remove('hide');
+
+        this.generateToDoItems(this.todos);
+      }
+    }, form);
+
+    menuMember.addEventListener('click', ({ target }) => {
+      if (target.classList.contains('menu__title')) {
+        // Toggle menu
+        if (menuMember.getAttribute('data-state') === 'active') {
+          menuMember.setAttribute('data-state', '');
+        } else {
+          menuMember.setAttribute('data-state', 'active');
+        }
+      }
+
+      if (target.classList.contains('menu__label')) {
+        // Close when click to input option
+        menuTitleMember.textContent = target.textContent;
+        menuMember.setAttribute('data-state', '');
+      }
+    });
+  }
+
   async init() {
     this.todos = await Data.getData(URL_EVENTS);
     this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
     localStorage.setItem('events', JSON.stringify(this.todos));
 
-    const memebersListContainer = this.createHeader();
-    this.generateMembers(memebersListContainer);
+    this.createHeader();
+    await this.generateMembers(this.membersContainer);
+    this.renderModalChooseUser();
     this.createMain();
     createFooter(this.root);
     this.handlerInputMembers();
@@ -290,7 +377,7 @@ export default class Calendar {
     this.contentContainer.addEventListener('click', ({ target }) => {
       if (target.classList.contains('main__item_btn-close')) {
         const eventTitle = target.previousElementSibling.textContent;
-        createModalDialog(this.root, `Вы уверены, что хотите удалить ивент ${eventTitle}?`,
+        createModalDialog(this.root, `Are you sure you want to delete the event: ${eventTitle}?`,
           this.handlerDeleteEvent.bind(this, target.parentElement));
       }
     });
@@ -300,8 +387,10 @@ export default class Calendar {
       this.menuTitle.textContent = this.menuTitle.getAttribute('data-default');
 
       this.todos.map((todo) => {
+        const members = this.members.map((item) => item.name);
+
         todo.participants.forEach((member) => {
-          if (this.members.includes(member)) {
+          if (members.includes(member)) {
             todo.complete = true;
           } else {
             todo.complete = false;
@@ -324,6 +413,20 @@ export default class Calendar {
         this.todos = eventsList;
       });
     });
+
+    // Handle add member
+    this.btnAddMember.addEventListener('click', () => {
+      const form = create('form', 'modal-form', null, null, ['name', 'modal-form']);
+      const memberContainer = create('div', 'modal-form_line', null, form);
+      create('p', 'modal-form_label', 'Member', memberContainer);
+      create('input', 'modal-form__input', null, memberContainer,
+        ['type', 'text'], ['tab-index', '1'], ['name', 'memberName'], ['placeholder', 'add member']);
+
+      createModalDialog(this.root, 'Create new user', (name) => this.handlerAddNewMember(name), form);
+    });
+
+    // Handle change user
+    this.btnChangeUser.addEventListener('click', () => this.renderModalChooseUser());
 
     document.querySelector('.author:nth-of-type(2)').addEventListener('click',
       () => new Audio('../src/assets/meow.mp3').play());

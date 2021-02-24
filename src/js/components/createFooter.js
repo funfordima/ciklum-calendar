@@ -5,7 +5,7 @@ const createFooter = (parentElement) => {
   const authorContainer = create('div', 'author__container', null, footer);
   const author = create('div', 'author', null, authorContainer);
   create('a', '', 'Dima Litvinov', author, ['href', 'https://github.com/funfordima']);
-  const svgContainer = create('div', 'author', null, authorContainer);
+  const svgContainer = create('div', 'author hvr-buzz', null, authorContainer);
   const shareContainer = create('div', 'author', null, authorContainer, ['id', 'my-share']);
   const script = document.createElement('script');
   script.src = 'https://yastatic.net/share2/share.js';
