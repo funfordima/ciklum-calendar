@@ -123,8 +123,9 @@ html {
     background-color: #81c784;
   }
 
-  &.add-member {
-    margin-right: 0;
+  &.add-member,
+  &.change-member {
+    margin: 0;
     width: 16rem;
 
     &:hover {
@@ -140,6 +141,12 @@ html {
     align-items: center;
     gap: 1rem;
     order: 1;
+
+    &.--large {
+      width: 100%;
+      order: 0;
+      justify-content: space-around;
+    }
   }
 }
 

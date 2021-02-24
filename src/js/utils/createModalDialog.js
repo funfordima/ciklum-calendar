@@ -40,7 +40,7 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
       parentElement.removeChild(overlay);
     }
 
-    if (target.classList.contains('cancel-button') || target.classList.contains('overlay')) {
+    if (target.classList.contains('cancel-button')) {
       parentElement.removeChild(overlay);
     }
   });

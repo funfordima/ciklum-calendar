@@ -170,12 +170,12 @@ html {
   background-color: #81c784;
 }
 
-.event-btn.add-member {
-  margin-right: 0;
+.event-btn.add-member, .event-btn.change-member {
+  margin: 0;
   width: 16rem;
 }
 
-.event-btn.add-member:hover {
+.event-btn.add-member:hover, .event-btn.change-member:hover {
   background-color: #81a2c7;
 }
 
@@ -195,6 +195,15 @@ html {
   -webkit-box-ordinal-group: 2;
       -ms-flex-order: 1;
           order: 1;
+}
+
+.event-btn__container.--large {
+  width: 100%;
+  -webkit-box-ordinal-group: 1;
+      -ms-flex-order: 0;
+          order: 0;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
 }
 
 .menu {

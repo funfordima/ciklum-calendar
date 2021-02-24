@@ -25,19 +25,22 @@ export default class Calendar {
     const header = create('header', 'header', null, this.root);
     const headerTitle = create('h1', 'header__title', null, header);
     const navContainer = create('div', 'header__form_container', null, header);
-    this.btnAddMember = create('button', 'event-btn add-member hide', 'New Member +', navContainer,
+    const btnContainer = create('div', 'event-btn__container --large', null, navContainer);
+    this.btnAddMember = create('button', 'event-btn add-member hide', 'New Member +', btnContainer,
       ['type', 'submit'], ['value', 'New Member +']);
+    this.btnChangeUser = create('button', 'event-btn change-member', 'Change User', btnContainer,
+      ['type', 'submit'], ['value', 'Change User']);
     const form = create('form', 'header__form', null, navContainer, ['name', 'members-form']);
-    const btnContainer = create('div', 'event-btn__container', null, form);
+    const btnFormContainer = create('div', 'event-btn__container', null, form);
     this.menu = create('div', 'menu', null, form, ['data-state', '']);
     this.membersContainer = create('div', 'menu__content', null, this.menu);
 
     this.menuTitle = create('div', 'menu__title', null, this.menu, ['data-default', ''], ['tabindex', 0]);
     create('div', 'menu__container', this.menu, form);
-    this.btnAddItem = create('input', 'event-btn add-event hide', null, btnContainer,
+    this.btnAddItem = create('input', 'event-btn add-event hide', null, btnFormContainer,
       ['type', 'submit'], ['value', 'New Event +']);
 
-    this.resetMenuBtn = create('input', 'event-btn reset-event', null, btnContainer,
+    this.resetMenuBtn = create('input', 'event-btn reset-event', null, btnFormContainer,
       ['type', 'reset'], ['value', 'Clear it!']);
     create('a', 'header__title_link', 'Calendar', headerTitle, ['href', '#'], ['alt', 'logo link']);
   }
@@ -330,6 +333,7 @@ export default class Calendar {
       if (this.isAdmin) {
         this.btnAddMember.classList.remove('hide');
         this.btnAddItem.classList.remove('hide');
+
         this.generateToDoItems(this.todos);
       }
     }, form);
@@ -419,6 +423,9 @@ export default class Calendar {
 
       createModalDialog(this.root, 'Create new user', (name) => this.handlerAddNewMember(name), form);
     });
+
+    // Handle change user
+    this.btnChangeUser.addEventListener('click', () => this.renderModalChooseUser());
 
     document.querySelector('.author:nth-of-type(2)').addEventListener('click',
       () => new Audio('../src/assets/meow.mp3').play());
