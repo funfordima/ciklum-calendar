@@ -23,12 +23,12 @@ export default class Calendar {
 
   createHeader() {
     const header = create('header', 'header', null, this.root);
-    const headerTitle = create('h1', 'header__title', null, header);
+    const headerTitle = create('h1', 'header__title hvr-float-shadow', null, header);
     const navContainer = create('div', 'header__form_container', null, header);
     const btnContainer = create('div', 'event-btn__container --large', null, navContainer);
-    this.btnAddMember = create('button', 'event-btn add-member hide', 'New Member +', btnContainer,
+    this.btnAddMember = create('button', 'event-btn add-member hide hvr-shutter-out-vertical', 'New Member +', btnContainer,
       ['type', 'submit'], ['value', 'New Member +']);
-    this.btnChangeUser = create('button', 'event-btn change-member', 'Change User', btnContainer,
+    this.btnChangeUser = create('button', 'event-btn change-member hvr-sweep-to-right', 'Change User', btnContainer,
       ['type', 'submit'], ['value', 'Change User']);
     const form = create('form', 'header__form', null, navContainer, ['name', 'members-form']);
     const btnFormContainer = create('div', 'event-btn__container', null, form);
