@@ -53,6 +53,13 @@ Technologies stack:
 - [x] In order to delete a meeting user has to click the delete icon near the meeting title at “Calendar” screen and then confirm his action in a confirmation dialog.
 - [x] the minimum page width at which the app is checked for correct display and operation is 500px.
 
+## Task 1
+
+- [x] Each team member should belong either to User class or Admin class.
+- [x] When user opens an application he/she has to authorize himself using the select modal (like in the example mockup).
+- [x] If authorized user is Admin he is able to create and update events(if Drag and Drop was implemented in your test task).
+- [x] If authorized user is User he/she is not able to create/update events. This means that 'Create Event' button should be hidden for those users.
+
 ## Hacker scope
 - [x] Implement possibility to change meeting day/time using drag and drop technique on “Calendar” view.
 - [x] the data is saved in database (ex: firebase) 
