@@ -334,9 +334,12 @@ export default class Calendar {
       if (this.isAdmin) {
         this.btnAddMember.classList.remove('hide');
         this.btnAddItem.classList.remove('hide');
-
-        this.generateToDoItems(this.todos);
+      } else {
+        this.btnAddMember.classList.add('hide');
+        this.btnAddItem.classList.add('hide');
       }
+
+      this.generateToDoItems(this.todos);
     }, form);
 
     menuMember.addEventListener('click', ({ target }) => {
