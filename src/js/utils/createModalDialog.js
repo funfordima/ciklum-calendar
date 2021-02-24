@@ -30,10 +30,13 @@ const createModalDialog = (parentElement, msg, callback, child = null) => {
       let name = null;
       const nameContainer = textContainer.querySelector('.modal-form__input');
       const titleContainer = textContainer.querySelector('.menu__title');
+
       if (nameContainer) {
         name = nameContainer.value.trim();
-      } else {
+      } else if (titleContainer) {
         name = titleContainer.textContent;
+      } else {
+        name = textContainer.querySelector('.modal__text').textContent.slice(42, -1).trim();
       }
 
       callback(name);
