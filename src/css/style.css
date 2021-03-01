@@ -76,10 +76,6 @@ html {
   cursor: pointer;
 }
 
-.header__title_link:hover {
-  opacity: 0.8;
-}
-
 .header__form {
   width: 100%;
   display: -webkit-box;
