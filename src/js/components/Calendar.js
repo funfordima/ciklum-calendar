@@ -278,7 +278,7 @@ export default class Calendar {
     });
 
     if (isLoad) {
-      Data.sendData(`${MAIN_URL}events`, this.todos)
+      Data.putData(`${MAIN_URL}events`, this.todos, this.id)
         .then(() => {
           localStorage.setItem('events', JSON.stringify(this.todos));
           const msg = successMsg('Done!', this.root);
