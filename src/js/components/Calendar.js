@@ -2,7 +2,7 @@ import create from '../utils/create';
 import createNewItem from './createNewItem';
 import createItemMember from '../utils/createItemMember';
 import createDropDownList from './createDropDownList';
-import { URL_EVENTS, URL_MEMBERS, message } from '../constants/constants';
+import { message, MAIN_URL } from '../constants/constants';
 import User from '../utils/User';
 import Data from '../utils/data';
 import { successMsg, errorMsg } from './statusMsg';
@@ -19,6 +19,7 @@ export default class Calendar {
     this.contentContainer = '';
     this.currentUser = null;
     this.isAdmin = false;
+    this.id = null;
   }
 
   createHeader() {
@@ -46,10 +47,11 @@ export default class Calendar {
   }
 
   async generateMembers(parentElement) {
-    this.members = await Data.getData(URL_MEMBERS);
-    this.members = this.members[Object.keys(this.members)[Object.keys(this.members).length - 1]];
+    this.members = await Data.getData(`${MAIN_URL}members`) || '[]';
+    // this.members = this.members[Object.keys(this.members)[Object.keys(this.members).length - 1]];
+    this.members = JSON.parse((this.members[this.members.length - 1]).data);
     localStorage.setItem('members', JSON.stringify(this.members));
-
+    // Data.sendData(`${MAIN_URL}members`, this.members.slice(0, 3));
     createItemMember(this.members, parentElement);
     document.querySelectorAll('.menu__content input')
       .forEach((el, indx) => el.setAttribute('id', `${this.members[indx]}_header`));
@@ -87,6 +89,7 @@ export default class Calendar {
 
     let isDragging = null;
     const rerenderMain = this.generateToDoItems.bind(this);
+    const { id } = this;
 
     function dragStart() {
       isDragging = this;
@@ -162,7 +165,7 @@ export default class Calendar {
 
         document.querySelector('.invisible').replaceWith(todoContainer);
 
-        Data.sendData(URL_EVENTS, newEvents)
+        Data.putData(`${MAIN_URL}events`, newEvents, id)
           .then(() => {
             const main = document.querySelector('.main');
             localStorage.setItem('events', JSON.stringify(newEvents));
@@ -275,7 +278,7 @@ export default class Calendar {
     });
 
     if (isLoad) {
-      Data.sendData(URL_EVENTS, this.todos)
+      Data.putData(`${MAIN_URL}events`, this.todos, this.id)
         .then(() => {
           localStorage.setItem('events', JSON.stringify(this.todos));
           const msg = successMsg('Done!', this.root);
@@ -297,7 +300,7 @@ export default class Calendar {
     const members = JSON.parse(localStorage.getItem('members'));
     members.push(newMember);
 
-    Data.sendData(URL_MEMBERS, members)
+    Data.sendData(`${MAIN_URL}members`, members)
       .then(() => {
         localStorage.setItem('members', JSON.stringify(members));
         const msg = successMsg('Done!', this.root);
@@ -361,8 +364,10 @@ export default class Calendar {
   }
 
   async init() {
-    this.todos = await Data.getData(URL_EVENTS);
-    this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
+    this.todos = await Data.getData(`${MAIN_URL}events`) || '[]';
+    // this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
+    this.id = (this.todos[this.todos.length - 1]).id;
+    this.todos = JSON.parse((this.todos[this.todos.length - 1]).data);
     localStorage.setItem('events', JSON.stringify(this.todos));
 
     this.createHeader();

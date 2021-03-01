@@ -1,7 +1,7 @@
 import create from '../utils/create';
 import createDropDownList from './createDropDownList';
 import Data from '../utils/data';
-import { URL_EVENTS, message } from '../constants/constants';
+import { message, MAIN_URL } from '../constants/constants';
 import { successMsg, errorMsg } from './statusMsg';
 
 const createNewItem = (main, members, days, times, renderMainFunc, isReplace = false) => {
@@ -138,7 +138,7 @@ const createNewItem = (main, members, days, times, renderMainFunc, isReplace = f
 
         if (isLoad) {
           updateButtonMsg();
-          Data.sendData(URL_EVENTS, newEvents)
+          Data.sendData(`${MAIN_URL}events`, newEvents)
             .then(() => {
               localStorage.setItem('events', JSON.stringify(newEvents));
               const msg = successMsg(message.success, form);
