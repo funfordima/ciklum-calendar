@@ -1,6 +1,5 @@
 import create from '../utils/create';
 import createDropDownList from './createDropDownList';
-// import Data from '../utils/data';
 import { message } from '../constants/constants';
 import { errorMsg } from './statusMsg';
 import catchDecorator from '../utils/catchDecorator';
@@ -134,22 +133,14 @@ const createNewItem = (main, members, days, times, renderMainFunc) => {
         if (isLoad) {
           updateButtonMsg();
           catchDecorator()('sendData', form, 'events', newEvents)
-            // new Data(`${MAIN_URL}`).sendData('events', newEvents)
             .then(() => {
               localStorage.setItem('events', JSON.stringify(newEvents));
-              // const msg = successMsg(message.success, form);
               renderMainFunc();
 
               setTimeout(() => {
-                // form.removeChild(msg);
                 main.removeChild(overlay);
               }, 2100);
             })
-            // .catch((error) => {
-            //   const msg = errorMsg(error.message, form);
-
-            //   setTimeout(() => form.removeChild(msg), 2000);
-            // })
             .finally(() => {
               titleInput.value = '';
               menuTitleMember.textContent = menuTitleMember.getAttribute('data-default');

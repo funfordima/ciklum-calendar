@@ -12,11 +12,13 @@ const catchDecorator = () => async (fn, parentElement, ...args) => {
       throw new Error(`Could not fetch ${MAIN_URL}, status: ${response.status}`);
     }
 
-    const msg = successMsg(message.success, parentElement);
+    if (parentElement) {
+      const msg = successMsg(message.success, parentElement);
 
-    setTimeout(() => {
-      parentElement.removeChild(msg);
-    }, 2100);
+      setTimeout(() => {
+        parentElement.removeChild(msg);
+      }, 2100);
+    }
 
     return response;
   } catch (error) {

@@ -1,11 +1,9 @@
 import create from '../utils/create';
 import createNewItem from './createNewItem';
 import createItemMember from '../utils/createItemMember';
+import catchDecorator from '../utils/catchDecorator';
 import createDropDownList from './createDropDownList';
-import { message, MAIN_URL } from '../constants/constants';
 import User from '../utils/User';
-import Data from '../utils/data';
-import { successMsg, errorMsg } from './statusMsg';
 import createModalDialog from '../utils/createModalDialog';
 import createFooter from './createFooter';
 
@@ -47,7 +45,9 @@ export default class Calendar {
   }
 
   async generateMembers(parentElement) {
-    this.members = await new Data(MAIN_URL).getData('members') || '[]';
+    const response = await catchDecorator()('getData', null, 'members');
+    this.members = await response.json() || [];
+
     // this.members = this.members[Object.keys(this.members)[Object.keys(this.members).length - 1]];
     this.members = JSON.parse((this.members[this.members.length - 1]).data);
     localStorage.setItem('members', JSON.stringify(this.members));
@@ -165,23 +165,11 @@ export default class Calendar {
 
         document.querySelector('.invisible').replaceWith(todoContainer);
 
-        new Data(MAIN_URL).putData('events', newEvents, id)
+        catchDecorator()('putData', document.querySelector('.main'), 'events', newEvents, id)
           .then(() => {
-            const main = document.querySelector('.main');
             localStorage.setItem('events', JSON.stringify(newEvents));
-            const msg = successMsg(message.success, main);
 
             rerenderMain(newEvents);
-
-            setTimeout(() => {
-              main.removeChild(msg);
-            }, 2100);
-          })
-          .catch((error) => {
-            const main = document.querySelector('.main');
-            const msg = errorMsg(error.message, main);
-
-            setTimeout(() => main.removeChild(msg), 2000);
           });
       }
 
@@ -278,19 +266,11 @@ export default class Calendar {
     });
 
     if (isLoad) {
-      new Data(MAIN_URL).putData('events', this.todos, this.id)
+      catchDecorator()('putData', this.root, 'events', this.todos, this.id)
         .then(() => {
           localStorage.setItem('events', JSON.stringify(this.todos));
-          const msg = successMsg('Done!', this.root);
           // Rerender ItemToDo
           this.generateToDoItems(this.todos);
-
-          setTimeout(() => this.root.removeChild(msg), 2000);
-        })
-        .catch((error) => {
-          const msg = errorMsg(error.message, this.root);
-
-          setTimeout(() => this.root.removeChild(msg), 2000);
         });
     }
   }
@@ -300,18 +280,10 @@ export default class Calendar {
     const members = JSON.parse(localStorage.getItem('members'));
     members.push(newMember);
 
-    new Data(MAIN_URL).sendData('members', members)
+    catchDecorator()('sendData', this.root, 'members', members)
       .then(() => {
         localStorage.setItem('members', JSON.stringify(members));
-        const msg = successMsg('Done!', this.root);
         this.createMembers(this.membersContainer);
-
-        setTimeout(() => this.root.removeChild(msg), 2000);
-      })
-      .catch((error) => {
-        const msg = errorMsg(error.message, this.root);
-
-        setTimeout(() => this.root.removeChild(msg), 2000);
       });
   }
 
@@ -364,7 +336,9 @@ export default class Calendar {
   }
 
   async init() {
-    this.todos = await new Data(MAIN_URL).getData('events') || '[]';
+    const response = await catchDecorator()('getData', null, 'events');
+    this.todos = await response.json() || [];
+
     // this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
     this.id = (this.todos[this.todos.length - 1]).id;
     this.todos = JSON.parse((this.todos[this.todos.length - 1]).data);

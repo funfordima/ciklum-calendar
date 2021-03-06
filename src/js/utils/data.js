@@ -34,9 +34,7 @@ export default class Data {
       throw new Error(`Could not fetch ${this.url}, status: ${response.status}`);
     }
 
-    const json = await response.json();
-
-    return json;
+    return response;
   }
 
   async deleteData(eventName, id) {
