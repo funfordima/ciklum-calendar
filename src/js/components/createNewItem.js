@@ -138,7 +138,7 @@ const createNewItem = (main, members, days, times, renderMainFunc, isReplace = f
 
         if (isLoad) {
           updateButtonMsg();
-          Data.sendData(`${MAIN_URL}events`, newEvents)
+          new Data(`${MAIN_URL}`).sendData('events', newEvents)
             .then(() => {
               localStorage.setItem('events', JSON.stringify(newEvents));
               const msg = successMsg(message.success, form);

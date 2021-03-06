@@ -47,7 +47,7 @@ export default class Calendar {
   }
 
   async generateMembers(parentElement) {
-    this.members = await Data.getData(`${MAIN_URL}members`) || '[]';
+    this.members = await new Data(MAIN_URL).getData('members') || '[]';
     // this.members = this.members[Object.keys(this.members)[Object.keys(this.members).length - 1]];
     this.members = JSON.parse((this.members[this.members.length - 1]).data);
     localStorage.setItem('members', JSON.stringify(this.members));
@@ -165,7 +165,7 @@ export default class Calendar {
 
         document.querySelector('.invisible').replaceWith(todoContainer);
 
-        Data.putData(`${MAIN_URL}events`, newEvents, id)
+        new Data(MAIN_URL).putData('events', newEvents, id)
           .then(() => {
             const main = document.querySelector('.main');
             localStorage.setItem('events', JSON.stringify(newEvents));
@@ -278,7 +278,7 @@ export default class Calendar {
     });
 
     if (isLoad) {
-      Data.putData(`${MAIN_URL}events`, this.todos, this.id)
+      new Data(MAIN_URL).putData('events', this.todos, this.id)
         .then(() => {
           localStorage.setItem('events', JSON.stringify(this.todos));
           const msg = successMsg('Done!', this.root);
@@ -300,7 +300,7 @@ export default class Calendar {
     const members = JSON.parse(localStorage.getItem('members'));
     members.push(newMember);
 
-    Data.sendData(`${MAIN_URL}members`, members)
+    new Data(MAIN_URL).sendData('members', members)
       .then(() => {
         localStorage.setItem('members', JSON.stringify(members));
         const msg = successMsg('Done!', this.root);
@@ -364,7 +364,7 @@ export default class Calendar {
   }
 
   async init() {
-    this.todos = await Data.getData(`${MAIN_URL}events`) || '[]';
+    this.todos = await new Data(MAIN_URL).getData('events') || '[]';
     // this.todos = this.todos[Object.keys(this.todos)[Object.keys(this.todos).length - 1]];
     this.id = (this.todos[this.todos.length - 1]).id;
     this.todos = JSON.parse((this.todos[this.todos.length - 1]).data);
