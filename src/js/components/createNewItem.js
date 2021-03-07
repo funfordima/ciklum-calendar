@@ -133,6 +133,7 @@ const createNewItem = (main, members, days, times, renderMainFunc) => {
         if (isLoad) {
           updateButtonMsg();
           catchDecorator()('sendData', form, 'events', newEvents)
+            // EE.emit('event: send-data', form, 'events', newEvents)
             .then(() => {
               localStorage.setItem('events', JSON.stringify(newEvents));
               renderMainFunc();

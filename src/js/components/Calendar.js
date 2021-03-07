@@ -6,6 +6,19 @@ import createDropDownList from './createDropDownList';
 import User from '../utils/User';
 import createModalDialog from '../utils/createModalDialog';
 import createFooter from './createFooter';
+import EventEmitter from '../utils/Emitter';
+
+const EE = new EventEmitter();
+EE.subscribe('put-data', (newEvents, id) => catchDecorator()('putData', document.querySelector('.main'), 'events', newEvents, id)
+  .then(() => {
+    localStorage.setItem('events', JSON.stringify(newEvents));
+  }));
+
+EE.subscribe('send-data', (root, members) => catchDecorator()('sendData', root, 'members', members)
+  .then(() => {
+    localStorage.setItem('members', JSON.stringify(members));
+    return Promise.resolve();
+  }));
 
 export default class Calendar {
   constructor() {
@@ -88,7 +101,7 @@ export default class Calendar {
     });
 
     let isDragging = null;
-    const rerenderMain = this.generateToDoItems.bind(this);
+    const reRenderMain = this.generateToDoItems.bind(this);
     const { id } = this;
 
     function dragStart() {
@@ -165,12 +178,14 @@ export default class Calendar {
 
         document.querySelector('.invisible').replaceWith(todoContainer);
 
-        catchDecorator()('putData', document.querySelector('.main'), 'events', newEvents, id)
-          .then(() => {
-            localStorage.setItem('events', JSON.stringify(newEvents));
+        EE.emit('put-data', newEvents, id);
+        // .then(() => reRenderMain(newEvents));
+        // catchDecorator()('putData', document.querySelector('.main'), 'events', newEvents, id)
+        //   .then(() => {
+        //     localStorage.setItem('events', JSON.stringify(newEvents));
 
-            rerenderMain(newEvents);
-          });
+        reRenderMain(newEvents);
+        //   });
       }
 
       this.replaceWith(isDragging);
@@ -266,12 +281,14 @@ export default class Calendar {
     });
 
     if (isLoad) {
-      catchDecorator()('putData', this.root, 'events', this.todos, this.id)
-        .then(() => {
-          localStorage.setItem('events', JSON.stringify(this.todos));
-          // Rerender ItemToDo
-          this.generateToDoItems(this.todos);
-        });
+      EE.emit('put-data', this.todos, this.id);
+      // catchDecorator()('putData', this.root, 'events', this.todos, this.id)
+      //   .then(() => {
+      //     localStorage.setItem('events', JSON.stringify(this.todos));
+
+      // Rerender ItemToDo
+      this.generateToDoItems(this.todos);
+      //   });
     }
   }
 
@@ -280,6 +297,7 @@ export default class Calendar {
     const members = JSON.parse(localStorage.getItem('members'));
     members.push(newMember);
 
+    // EE.emit('send-data', this.root, members);
     catchDecorator()('sendData', this.root, 'members', members)
       .then(() => {
         localStorage.setItem('members', JSON.stringify(members));

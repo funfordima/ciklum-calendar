@@ -8,12 +8,12 @@ export default class Data {
     return Data.instance;
   }
 
-  async sendData(eventName, data) {
+  async sendData(endPoint, data) {
     /* eslint quotes: 0 */
     /* eslint no-useless-escape: 0 */
     const newData = JSON.stringify({ data: JSON.stringify(data), id: "string" }).replace(/"/g, '\"');
 
-    const response = await fetch(`${this.url}${eventName}`, {
+    const response = await fetch(`${this.url}${endPoint}`, {
       method: 'POST',
       body: newData,
       headers: {
@@ -27,8 +27,8 @@ export default class Data {
     return response;
   }
 
-  async getData(eventName) {
-    const response = await fetch(`${this.url}${eventName}`);
+  async getData(endPoint) {
+    const response = await fetch(`${this.url}${endPoint}`);
 
     if (!response.ok) {
       throw new Error(`Could not fetch ${this.url}, status: ${response.status}`);
@@ -37,8 +37,8 @@ export default class Data {
     return response;
   }
 
-  async deleteData(eventName, id) {
-    const response = await fetch(`${this.url}${eventName}/${id}`, {
+  async deleteData(endPoint, id) {
+    const response = await fetch(`${this.url}${endPoint}/${id}`, {
       method: 'DELETE',
     })
       .catch((err) => {
@@ -48,10 +48,10 @@ export default class Data {
     return response;
   }
 
-  async putData(eventName, data, id) {
+  async putData(endPoint, data, id) {
     const newData = JSON.stringify({ data: JSON.stringify(data), id }).replace(/"/g, '\"');
 
-    const response = await fetch(`${this.url}${eventName}/${id}`, {
+    const response = await fetch(`${this.url}${endPoint}/${id}`, {
       method: 'PUT',
       body: newData,
       headers: {
