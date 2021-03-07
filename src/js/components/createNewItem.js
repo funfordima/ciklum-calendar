@@ -1,10 +1,10 @@
 import create from '../utils/create';
 import createDropDownList from './createDropDownList';
-import Data from '../utils/data';
-import { message, MAIN_URL } from '../constants/constants';
-import { successMsg, errorMsg } from './statusMsg';
+import { message } from '../constants/constants';
+import { errorMsg } from './statusMsg';
+import catchDecorator from '../utils/catchDecorator';
 
-const createNewItem = (main, members, days, times, renderMainFunc, isReplace = false) => {
+const createNewItem = (main, members, days, times, renderMainFunc) => {
   const overlay = create('div', 'overlay', null, main);
   const modal = create('div', 'modal', null, overlay);
   const form = create('form', 'modal-form', null, modal, ['name', 'modal-form']);
@@ -116,18 +116,12 @@ const createNewItem = (main, members, days, times, renderMainFunc, isReplace = f
           const { day, time, title } = eventItem;
           const condition = newDay === day && newTime === time;
 
-          if (condition && inputEvent === title) {
-            if (!isReplace) {
-              const msg = errorMsg(message.failure, form);
-              isLoad = false;
+          if (condition && title) {
+            const msg = errorMsg(message.failure, form);
+            isLoad = false;
 
-              setTimeout(() => form.removeChild(msg), 2000);
-            } else {
-              isLoad = true;
-
-              return newEvent;
-            }
-          } else if (condition && inputEvent !== title) {
+            setTimeout(() => form.removeChild(msg), 2000);
+          } else if (condition && !title) {
             isLoad = true;
 
             return newEvent;
@@ -138,21 +132,15 @@ const createNewItem = (main, members, days, times, renderMainFunc, isReplace = f
 
         if (isLoad) {
           updateButtonMsg();
-          Data.sendData(`${MAIN_URL}events`, newEvents)
+          catchDecorator()('sendData', form, 'events', newEvents)
+            // EE.emit('event: send-data', form, 'events', newEvents)
             .then(() => {
               localStorage.setItem('events', JSON.stringify(newEvents));
-              const msg = successMsg(message.success, form);
               renderMainFunc();
 
               setTimeout(() => {
-                form.removeChild(msg);
                 main.removeChild(overlay);
               }, 2100);
-            })
-            .catch((error) => {
-              const msg = errorMsg(error.message, form);
-
-              setTimeout(() => form.removeChild(msg), 2000);
             })
             .finally(() => {
               titleInput.value = '';

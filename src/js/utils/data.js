@@ -1,10 +1,19 @@
 export default class Data {
-  static sendData(url, data) {
+  constructor(url) {
+    this.url = url;
+
+    if (!Data.instance) {
+      Data.instance = this;
+    }
+    return Data.instance;
+  }
+
+  async sendData(endPoint, data) {
     /* eslint quotes: 0 */
     /* eslint no-useless-escape: 0 */
     const newData = JSON.stringify({ data: JSON.stringify(data), id: "string" }).replace(/"/g, '\"');
 
-    return fetch(url, {
+    const response = await fetch(`${this.url}${endPoint}`, {
       method: 'POST',
       body: newData,
       headers: {
@@ -14,33 +23,35 @@ export default class Data {
       .catch((err) => {
         throw new Error(`Could not fetch, message: ${err.message}`);
       });
+
+    return response;
   }
 
-  static async getData(url) {
-    const response = await fetch(url);
+  async getData(endPoint) {
+    const response = await fetch(`${this.url}${endPoint}`);
 
     if (!response.ok) {
-      throw new Error(`Could not fetch ${url}, status: ${response.status}`);
+      throw new Error(`Could not fetch ${this.url}, status: ${response.status}`);
     }
 
-    const json = await response.json();
-
-    return json;
+    return response;
   }
 
-  static deleteData(url, id) {
-    return fetch(`${url}/${id}`, {
+  async deleteData(endPoint, id) {
+    const response = await fetch(`${this.url}${endPoint}/${id}`, {
       method: 'DELETE',
     })
       .catch((err) => {
         throw new Error(`Could not fetch, message: ${err.message}`);
       });
+
+    return response;
   }
 
-  static putData(url, data, id) {
+  async putData(endPoint, data, id) {
     const newData = JSON.stringify({ data: JSON.stringify(data), id }).replace(/"/g, '\"');
 
-    return fetch(`${url}/${id}`, {
+    const response = await fetch(`${this.url}${endPoint}/${id}`, {
       method: 'PUT',
       body: newData,
       headers: {
@@ -50,5 +61,7 @@ export default class Data {
       .catch((err) => {
         throw new Error(`Could not fetch, message: ${err.message}`);
       });
+
+    return response;
   }
 }
