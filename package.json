@@ -1,0 +1,65 @@
+{
+  "name": "cicklum-calendar",
+  "version": "1.0.0",
+  "description": "calendar App",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development npx webpack --mode development",
+    "build": "cross-env NODE_ENV=production npx webpack --mode production",
+    "watch": "cross-env NODE_ENV=development npx webpack --mode development --watch",
+    "start": "cross-env NODE_ENV=development webpack serve",
+    "test": "jest",
+    "testwatch": "jest --watchAll"
+  },
+  "browserslist": "> 0.25%, not dead",
+  "keywords": [
+    "cicklum-calendar",
+    "js",
+    "javascript",
+    "calendar"
+  ],
+  "author": "Dima Litvinov d.g.litvinov@gmail.com",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.13.10",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/preset-env": "^7.13.10",
+    "@types/jest": "^26.0.20",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^26.6.3",
+    "babel-loader": "^8.2.1",
+    "babel-polyfill": "^6.26.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^6.3.0",
+    "cross-env": "^7.0.2",
+    "css-loader": "^5.0.1",
+    "eslint": "^7.19.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "fetch-mock": "^9.11.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^4.5.0",
+    "jest": "^26.6.3",
+    "mini-css-extract-plugin": "^1.3.1",
+    "node-sass": "^5.0.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.4",
+    "sass-loader": "^10.1.0",
+    "style-loader": "^2.0.0",
+    "terser-webpack-plugin": "^5.0.3",
+    "webpack": "^5.4.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "axios": "^0.21.1",
+    "core-js": "^3.8.3",
+    "node-fetch": "^2.6.1",
+    "normalize.css": "^8.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/funfordima/ciklum-calendar"
+  }
+}
