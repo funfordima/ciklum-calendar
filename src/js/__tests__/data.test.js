@@ -78,7 +78,7 @@ describe('class Data should work', () => {
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
-  test('Data.sendData method should work', async () => {
+  test('Data.sendData method should work', () => {
     const responseBody = { response: 'data send from the server' };
 
     fetchMock.once(MAIN_URL + 'members', {
@@ -96,13 +96,13 @@ describe('class Data should work', () => {
       })
       .then(function (json) {
         console.log(json);
-        expect(json).toEqual(responseBody);
+        expect(JSON.parse(json)).toEqual(responseBody);
 
         done();
       });
   });
 
-  test('Data.putData method should work', async () => {
+  test('Data.putData method should work', () => {
     const resp = { response: 'data from the server' };
     const id = '9ba607bf-b59f-4517-8fbe-b21b421d2e78';
 
@@ -122,7 +122,7 @@ describe('class Data should work', () => {
       })
       .then(function (json) {
         console.log(json);
-        expect(json).toEqual(resp);
+        expect(JSON.parse(json)).toEqual(resp);
         expect(fn).toHaveBeenCalledTimes(1);
         done();
       });
